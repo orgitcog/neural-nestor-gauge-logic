@@ -1,5 +1,23 @@
 # Tensor Logic Demo
 
+<!-- TOC -->
+
+- [The Core Insight](#the-core-insight)
+- [Demo Features](#demo-features)
+  - [7 Interactive Examples](#7-interactive-examples)
+  - [Core Tensor Logic Engine](#core-tensor-logic-engine)
+- [What This Unifies](#what-this-unifies)
+  - [Symbolic AI](#symbolic-ai)
+  - [Neural Networks](#neural-networks)
+  - [Probabilistic AI](#probabilistic-ai)
+  - [Hybrid Methods](#hybrid-methods)
+- [Why Does This Matter?](#why-does-this-matter)
+- [References](#references)
+- [TO DO](#to-do)
+- [Getting Started for Development](#getting-started-for-development)
+- [License](#license)
+
+<!-- /TOC -->
 An interactive educational demo of **Pedro Domingos' Tensor Logic** — a programming paradigm that unifies neural and symbolic AI at a fundamental level.
 
 Based on the paper: [Tensor Logic: The Language of AI](https://arxiv.org/abs/2510.12269) by Prof. Emeritus Pedro Domingos (University of Washington)
@@ -50,61 +68,6 @@ The engine implements Einstein summation (`einsum`) which is the fundamental ope
 // Attention: Scores[q,k] = Query[q,d] · Key[k,d]
 ```
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm
-
-### Installation
-
-```bash
-npm install
-```
-
-### Development
-
-```bash
-npm run dev
-```
-
-Then open http://localhost:3000 in your browser.
-
-### Build
-
-```bash
-npm run build
-```
-
-### Type Checking & Linting
-
-```bash
-npm run typecheck
-npm run lint
-```
-
-## Project Structure
-
-```
-tensor-logic/
-├── src/
-│   ├── index.html          # Main HTML entry point
-│   ├── main.ts             # Application entry point & UI
-│   ├── styles.css          # Styling
-│   └── tensor-logic/
-│       ├── core.ts         # Core tensor operations & einsum
-│       └── examples/
-│           ├── logic.ts      # Logic programming example
-│           ├── mlp.ts        # Multi-layer perceptron
-│           ├── transformer.ts # Transformer attention
-│           ├── kernel.ts     # Kernel machines (SVM)
-│           └── graphical.ts  # Bayesian networks & HMMs
-├── package.json
-├── tsconfig.json
-└── vite.config.ts
-```
-
 ## What This Unifies
 
 ### Symbolic AI
@@ -149,6 +112,10 @@ tensor-logic/
 ## TO DO
 
 - [ ] Validate these models against known ML examples from reputable sources (e.g., textbook examples, benchmark datasets, reference implementations)
+
+## Getting Started for Development
+
+For development setup, installation instructions, and project structure, see the [Development Guide](README_dev.md).
 
 ## License
 
