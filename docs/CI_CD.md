@@ -191,7 +191,7 @@ jobs:
 For this project, **no secrets are required** for CI since it's a static frontend app with no API keys.
 
 If you add features that require secrets later:
-1. Go to: `https://github.com/YOUR_USERNAME/tensor-logic/settings/secrets/actions`
+1. Go to: `https://github.com/MrBesterTester/tensor-logic/settings/secrets/actions`
 2. Click "New repository secret"
 3. Add secrets as needed
 4. Reference in workflow: `${{ secrets.SECRET_NAME }}`
@@ -212,7 +212,7 @@ If you add features that require secrets later:
    ```
 
 3. **Watch it run:**
-   - Go to: `https://github.com/YOUR_USERNAME/tensor-logic/actions`
+   - Go to: `https://github.com/MrBesterTester/tensor-logic/actions`
    - You should see a workflow run start automatically
    - Click on it to watch live logs
    - Should complete in ~2-3 minutes
@@ -286,7 +286,7 @@ shuttle deploy --static dist/
 
 ```bash
 # 1. Ensure CI passed (check GitHub Actions)
-#    Go to: https://github.com/YOUR_USERNAME/tensor-logic/actions
+#    Go to: https://github.com/MrBesterTester/tensor-logic/actions
 #    Verify: Latest run shows green ✅
 
 # 2. Build locally (optional, CI already did this)
