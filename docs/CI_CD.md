@@ -215,14 +215,14 @@ If you haven't created a GitHub repository for this project yet:
 
 3. **Connect your local repo to GitHub:**
 
-   **Option A: Using HTTPS (requires credentials each time):**
-   ```bash
-   git remote add origin https://github.com/MrBesterTester/tensor-logic.git
-   ```
-
-   **Option B: Using SSH (recommended, works with 1Password):**
+   **Option A: Using SSH (recommended, works with 1Password):**
    ```bash
    git remote add origin git@github.com:MrBesterTester/tensor-logic.git
+   ```
+
+   **Option B: Using HTTPS (requires credentials each time):**
+   ```bash
+   git remote add origin https://github.com/MrBesterTester/tensor-logic.git
    ```
 
 **Note:** If the repository already exists and is connected, skip this step.
@@ -290,6 +290,7 @@ Using SSH with 1Password eliminates credential prompts and provides seamless aut
 2. **Watch it run:**
    - Go to GitHub.com in your browser: `https://github.com/MrBesterTester/tensor-logic/actions`
    - You should see a workflow run start automatically (appears within seconds of pushing)
+   - **Tip:** On subsequent runs, refresh the page or navigate back to this link to see the latest run. Otherwise, you'll be looking at the last run you viewed.
    - Click on the workflow run to watch live logs
    - Should complete in ~2-3 minutes
 
