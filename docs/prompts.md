@@ -14,6 +14,9 @@
 - [md review problems: with Auto mode in Cursor](#md-review-problems-with-auto-mode-in-cursor)
   - [md review problems Consolidated Prompt](#md-review-problems-consolidated-prompt)
   - [md review problems Summary of Generated Features](#md-review-problems-summary-of-generated-features)
+- [Security: with Auto mode in Cursor](#security-with-auto-mode-in-cursor)
+  - [Security Consolidated Prompt](#security-consolidated-prompt)
+  - [Security Summary of Generated Features](#security-summary-of-generated-features)
 
 <!-- /TOC -->
 This document consolidates the prompts used to generate the Tensor Logic educational web application.
@@ -315,3 +318,167 @@ The prompt above resulted in:
      - **Web Searches:** Check the "automatic browsing" checkbox in the permission dialog (may appear grayed out but is clickable)
      - **Other Operations:** Use Auto-Run Mode (Settings → Chat → Auto-Run) or configure `cli-config.json` with minimal allowlists
      - **Security:** Always include denylists for dangerous operations; Cursor lacks `--dangerously-skip-permissions` equivalent
+
+---
+
+## Security: with Auto mode in Cursor
+
+### Security Consolidated Prompt
+
+> Perform a comprehensive security audit and implementation for the Tensor Logic project, a static frontend educational demo. The project has no backend, no user data collection, and is deployed to Shuttle.dev as a static site.
+>
+> **Initial Security Review:**
+> - Review existing security documentation from similar projects (e.g., `docs/SECURITY_AUDIT.md` from photo-fun3 project)
+> - Review the project's `README.md` and `docs/CI_CD.md` to understand the current setup
+> - Research current security best practices for static frontend applications
+> - Identify security gaps and provide recommendations
+>
+> **Immediate Security Measures (Critical):**
+> 1. **Enhanced .gitignore**
+>    - Add comprehensive patterns for environment variables (`.env`, `.env.*`)
+>    - Add patterns for secrets and keys (`**/*.key`, `**/*.pem`, `**/Secrets*.toml`)
+>    - Add IDE files (`.vscode/*`, `.idea/`, `*.swp`) with exception for `.vscode/settings.json`
+>    - Add OS files (`.DS_Store`, `Thumbs.db`)
+>    - Add temporary and cache files
+>
+> 2. **Dependency Vulnerability Scanning**
+>    - Add `npm audit --audit-level=moderate` to GitHub Actions CI workflow
+>    - Configure to report issues without failing builds (`continue-on-error: true`)
+>
+> 3. **Enable Dependabot**
+>    - Create `.github/dependabot.yml` with weekly automated dependency updates
+>    - Group dev dependencies to reduce PR noise
+>    - Limit open PRs to 5
+>    - Ignore major version updates (require manual review)
+>
+> **Short-Term Security Measures (High Priority):**
+> 4. **Content Security Policy (CSP)**
+>    - Add CSP meta tag to `src/index.html` (no backend available)
+>    - Configure to allow only same-origin resources
+>    - Remove external font sources (will be self-hosted)
+>    - Ensure CSP is on a single line (no literal newlines in attribute)
+>    - Note: `frame-ancestors` is not supported in meta tags (only HTTP headers)
+>
+> 5. **Subresource Integrity (SRI) via Self-Hosted Fonts**
+>    - Download and self-host all Google Fonts (Crimson Pro, JetBrains Mono, Outfit)
+>    - Use google-webfonts-helper API or manual download
+>    - Create `src/fonts.css` with @font-face declarations
+>    - Update `src/index.html` to use local fonts instead of CDN
+>    - Update CSP to only allow `'self'` for fonts
+>    - Store fonts in `src/fonts/` directory (woff2 format)
+>
+> 6. **GitHub Repository Security Settings**
+>    - Create comprehensive setup guide for manual GitHub security configuration
+>    - Document branch protection rules setup
+>    - Document Dependabot alerts and security updates enablement
+>    - Document secret scanning configuration
+>    - Verify repository visibility (should be PUBLIC for educational demo)
+>    - Include step-by-step instructions with URLs and verification checklist
+>    - Note: These require manual configuration via GitHub web interface
+>
+> 7. **CI Security Testing**
+>    - Add TruffleHog secret scanning to CI workflow
+>    - Fix base branch reference to work for both push and pull_request events
+>    - Use fallback: `github.event.pull_request.base.ref || github.event.repository.default_branch || 'main'`
+>
+> **Documentation Consolidation:**
+> - Create comprehensive `docs/SECURITY_AUDIT.md` as single source of truth
+> - Split Repository Security section into Local and Remote (GitHub) subsections
+> - Merge GitHub security setup guide into SECURITY_AUDIT.md (no duplication)
+> - Add clickable reference links in Executive Summary to support Recommended Priority
+> - Update Key Findings to reflect current state (remove contradictory "Missing... - COMPLETE" format)
+> - Mark completed items with ✅ status indicators
+> - Include implementation status checklist
+>
+> **Bug Fixes:**
+> - Fix TruffleHog base branch reference for pull request events
+> - Remove unsupported `frame-ancestors` directive from CSP meta tag
+>
+> **Additional Requirements:**
+> - All security measures should be documented with current status
+> - Provide clear action items for manual steps (GitHub settings)
+> - Include verification steps and troubleshooting guidance
+> - Maintain consistent formatting and cross-references
+> - Update TOC automatically when adding new sections
+
+### Security Summary of Generated Features
+
+The prompt above resulted in:
+
+1. **Comprehensive Security Audit** (`docs/SECURITY_AUDIT.md`)
+   - 1,198-line security audit document as single source of truth
+   - Executive Summary with clickable links to relevant sections
+   - Current Security Posture assessment (Strengths and Gaps)
+   - Security Recommendations organized by priority (Immediate, Short-Term, Medium-Term, Long-Term)
+   - Detailed sections for Static Frontend Security, CI/CD Security, Repository Security, Deployment Security
+   - OWASP Top 10 Compliance analysis
+   - Incident Response procedures
+   - Implementation Status tracking with checklists
+
+2. **Enhanced .gitignore** (`.gitignore`)
+   - Comprehensive security patterns for environment variables, secrets, keys
+   - IDE files (with exception for `.vscode/settings.json`)
+   - OS files, temporary files, cache files
+   - Comments explaining font file inclusion (required for self-hosting)
+
+3. **Dependabot Configuration** (`.github/dependabot.yml`)
+   - Weekly automated dependency updates (Monday 9 AM)
+   - Dev dependencies grouped to reduce PR noise
+   - Open PR limit: 5
+   - Major version updates ignored (manual review required)
+   - Automated labels and reviewer assignment
+
+4. **CI Security Scanning** (`.github/workflows/ci.yml`)
+   - `npm audit` step for dependency vulnerability scanning (moderate+ severity)
+   - TruffleHog secret scanning with proper base branch handling for PR events
+   - Both steps configured with `continue-on-error: true` to report without failing builds
+   - Fixed base branch reference: `github.event.pull_request.base.ref || github.event.repository.default_branch || 'main'`
+
+5. **Content Security Policy (CSP)** (`src/index.html`)
+   - CSP meta tag added to `<head>` section
+   - Configured for same-origin resources only
+   - Removed unsupported `frame-ancestors` directive (not supported in meta tags)
+   - Single-line format to prevent parsing issues
+   - Blocks unauthorized resource loading and XSS attacks
+
+6. **Self-Hosted Fonts (SRI Implementation)** (`src/fonts.css`, `src/fonts/`, `scripts/download-fonts.sh`)
+   - All Google Fonts self-hosted (Crimson Pro, JetBrains Mono, Outfit)
+   - Fonts downloaded via google-webfonts-helper API
+   - `@font-face` declarations in `src/fonts.css`
+   - Font files stored in `src/fonts/` directory (woff2 format)
+   - Removed external CDN dependencies from `index.html`
+   - Updated CSP to only allow `'self'` for fonts
+   - Download script for future font updates
+   - README in fonts directory with download instructions
+
+7. **GitHub Repository Security Documentation** (merged into `docs/SECURITY_AUDIT.md`)
+   - Comprehensive Remote Repository Security section
+   - Step-by-step setup instructions for branch protection
+   - Dependabot alerts and security updates configuration
+   - Secret scanning setup guidance
+   - Repository visibility verification
+   - Verification checklist with current status
+   - Troubleshooting section
+   - GitHub CLI commands for verification
+
+8. **Documentation Improvements**
+   - Consolidated `GITHUB_SECURITY_SETUP.md` into `SECURITY_AUDIT.md` (single source of truth)
+   - Split Repository Security into Local and Remote (GitHub) subsections
+   - Added clickable reference links in Executive Summary
+   - Fixed contradictory wording in Key Findings section
+   - Updated all cross-references to point to merged sections
+   - Implementation status tracking with clear ✅ indicators
+
+9. **Bug Fixes**
+   - **TruffleHog base branch fix:** Uses fallback chain for both push and PR events
+   - **CSP meta tag fix:** Removed unsupported `frame-ancestors` directive
+
+10. **Key Security Achievements:**
+    - ✅ Enhanced .gitignore prevents accidental secret commits
+    - ✅ Automated dependency vulnerability scanning in CI
+    - ✅ Secret scanning in CI pipeline
+    - ✅ Content Security Policy implemented
+    - ✅ Self-hosted fonts eliminate external CDN dependencies
+    - ✅ Subresource Integrity enabled via self-hosting
+    - ✅ Comprehensive security documentation as single source of truth
+    - ✅ GitHub security settings documented (manual setup required)
