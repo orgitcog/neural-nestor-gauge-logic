@@ -1,6 +1,7 @@
 # CI/CD Setup Guide for Tensor Logic
 
 <!-- TOC -->
+
 - [Purpose](#purpose)
 - [Overview](#overview)
 - [GitHub Actions CI Setup](#github-actions-ci-setup)
@@ -14,9 +15,14 @@
 - [Workflow Configuration](#workflow-configuration)
   - [What Gets Tested](#what-gets-tested)
   - [When CI Runs](#when-ci-runs)
+  - [Skipping CI (Optional)](#skipping-ci-optional)
   - [Controlling CI](#controlling-ci)
 - [Troubleshooting](#troubleshooting)
+  - [CI Fails But Local Build Works](#ci-fails-but-local-build-works)
+  - [Deployment Fails](#deployment-fails)
+  - [Secrets Not Working](#secrets-not-working)
 - [Next Steps](#next-steps)
+
 <!-- /TOC -->
 
 ## Purpose
