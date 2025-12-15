@@ -100,17 +100,30 @@ If you plan to use the GitHub MCP server in Cursor, you'll need a GitHub Persona
 
 4. **Copy the Token:**
    - **Important:** Copy the token immediately - you won't be able to see it again!
-   - Add it to your `~/.cursor/mcp.json` file in the `env` section:
+   - Add it to your `~/.cursor/mcp.json` file in the `env` section of the GitHub MCP server:
      ```json
-     "env": {
-       "GITHUB_PERSONAL_ACCESS_TOKEN": "paste_your_token_here"
+     {
+       "mcpServers": {
+         "github": {
+           "command": "npx",
+           "args": ["-y", "github-mcp@latest"],
+           "env": {
+             "GITHUB_PERSONAL_ACCESS_TOKEN": "paste_your_token_here"
+           }
+         }
+       }
      }
      ```
-   - Restart Cursor for the changes to take effect
+   - Reload Cursor to apply changes:
+     - Press `Cmd+Shift+P` → Type "Reload Window" → Select it
+     - Or fully restart Cursor if needed
 
 **Direct link:** https://github.com/settings/tokens
 
-**Note:** This step is only needed if you want to use GitHub MCP features in Cursor. It's not required for GitHub Actions CI to work.
+**Note:** 
+- This step is only needed if you want to use GitHub MCP features in Cursor. It's not required for GitHub Actions CI to work.
+- The GitHub MCP server uses the npm package `github-mcp` (no Docker required).
+- After adding the token, use "Reload Window" command (`Cmd+Shift+P`) instead of a full restart.
 
 ### Step 1: Create Workflow File
 
