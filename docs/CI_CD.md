@@ -5,6 +5,7 @@
 - [Purpose](#purpose)
 - [Overview](#overview)
 - [GitHub Actions CI Setup](#github-actions-ci-setup)
+  - [Step 0: Get GitHub Personal Access Token (Optional)](#step-0-get-github-personal-access-token-optional)
   - [Step 1: Create Workflow File](#step-1-create-workflow-file)
   - [Step 2: Configure GitHub Secrets (if needed)](#step-2-configure-github-secrets-if-needed)
   - [Step 3: Push and Test](#step-3-push-and-test)
@@ -77,6 +78,39 @@ This guide provides step-by-step instructions for setting up:
 ---
 
 ## GitHub Actions CI Setup
+
+### Step 0: Get GitHub Personal Access Token (Optional)
+
+If you plan to use the GitHub MCP server in Cursor, you'll need a GitHub Personal Access Token:
+
+1. **Go to GitHub Settings:**
+   - Log in to your GitHub account
+   - Click your profile picture (top right) → **Settings**
+   - In the left sidebar, click **Developer settings**
+
+2. **Create a New Token:**
+   - Under **Personal access tokens**, click **Tokens (classic)**
+   - Click **Generate new token (classic)**
+
+3. **Configure the Token:**
+   - **Note:** Give it a descriptive name (e.g., "Cursor MCP")
+   - **Expiration:** Choose an expiration period
+   - **Scopes:** Select `repo` (full control of private repositories)
+   - Click **Generate token**
+
+4. **Copy the Token:**
+   - **Important:** Copy the token immediately - you won't be able to see it again!
+   - Add it to your `~/.cursor/mcp.json` file in the `env` section:
+     ```json
+     "env": {
+       "GITHUB_PERSONAL_ACCESS_TOKEN": "paste_your_token_here"
+     }
+     ```
+   - Restart Cursor for the changes to take effect
+
+**Direct link:** https://github.com/settings/tokens
+
+**Note:** This step is only needed if you want to use GitHub MCP features in Cursor. It's not required for GitHub Actions CI to work.
 
 ### Step 1: Create Workflow File
 
