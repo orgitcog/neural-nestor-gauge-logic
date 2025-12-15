@@ -15,7 +15,8 @@ interface Heading {
 function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/\//g, '-')        // Convert slashes to hyphens first (for CI/CD, etc.)
+    .replace(/[^\w\s-]/g, '')  // Remove other special characters
     .replace(/\s+/g, '-')      // Replace spaces with hyphens
     .replace(/-+/g, '-')       // Replace multiple hyphens with single
     .trim();

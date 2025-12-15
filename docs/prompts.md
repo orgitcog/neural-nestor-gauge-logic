@@ -8,9 +8,12 @@
 - [Performance - with Auto mode in Cursor](#performance-with-auto-mode-in-cursor)
   - [Unified Performance Optimization Analysis Prompt](#unified-performance-optimization-analysis-prompt)
   - [Summary of Generated Analysis](#summary-of-generated-analysis)
-- [CI/CD - with Auto mode in Cursor](#cicd-with-auto-mode-in-cursor)
-  - [Consolidated Prompt](#consolidated-prompt)
-  - [Summary of Generated Features](#summary-of-generated-features)
+- [CI/CD - with Auto mode in Cursor](#ci-cd-with-auto-mode-in-cursor)
+  - [CI/CD Consolidated Prompt](#ci-cd-consolidated-prompt)
+  - [CI/CD Summary of Generated Features](#ci-cd-summary-of-generated-features)
+- [md review problems - with Auto mode in Cursor](#md-review-problems-with-auto-mode-in-cursor)
+  - [md review problems Consolidated Prompt](#md-review-problems-consolidated-prompt)
+  - [md review problems Summary of Generated Features](#md-review-problems-summary-of-generated-features)
 
 <!-- /TOC -->
 This document consolidates the prompts used to generate the Tensor Logic educational web application.
@@ -140,7 +143,7 @@ The prompt above resulted in:
 
 ## CI/CD - with Auto mode in Cursor
 
-### Consolidated Prompt
+### CI/CD Consolidated Prompt
 
 > Set up a complete CI/CD pipeline for the Tensor Logic project with the following requirements:
 >
@@ -189,7 +192,7 @@ The prompt above resulted in:
 > - Ensure build artifacts are generated and uploaded correctly
 > - Test that the workflow triggers automatically on pushes
 
-### Summary of Generated Features
+### CI/CD Summary of Generated Features
 
 The prompt above resulted in:
 
@@ -235,3 +238,51 @@ The prompt above resulted in:
    - Helpful tips (e.g., refreshing browser to see new workflow runs)
    - Troubleshooting guidance
    - Visual workflow diagram showing local → CI → deployment flow
+
+---
+
+## md review problems - with Auto mode in Cursor
+
+### md review problems Consolidated Prompt
+
+> Fix the following Cursor workflow issues:
+>
+> **Markdown File Opening Problem:**
+> - A markdown file (`docs/prompts.md`) cannot be opened in Cursor, showing error: "The editor could not be opened due to an unexpected error"
+> - The backup file (`docs/prompts.md.backup`) opens fine, suggesting the issue is related to markdown preview/rendering mode
+> - I want markdown files to open in preview mode automatically, but this specific file crashes when trying to open in preview
+> - Fix the file so it can open in preview mode, or configure workspace settings appropriately
+>
+> **Local Commit Command:**
+> - I want a simple way to commit all outstanding work to the local git repository only (no push to remote)
+> - I'd like to be able to simply say "commit locally" in the chat and have you execute `git add -A && git commit` with an appropriate commit message
+> - This should be a conversational command - when I type "commit locally", you should recognize it and perform the local commit operation
+>
+> **Additional Considerations:**
+> - Check Cursor's local settings files first before searching the web for Cursor-specific features
+> - Understand that as an AI running inside Cursor, you should have direct knowledge of Cursor's capabilities
+> - When investigating issues, prioritize checking local configuration files over web searches
+
+### md review problems Summary of Generated Features
+
+The prompt above resulted in:
+
+1. **Markdown Preview Configuration** (`.vscode/settings.json`)
+   - Configured workspace settings to enable automatic markdown preview mode
+   - Set `workbench.editorAssociations` to open `*.md` files in preview editor
+   - Added markdown preview settings (font size, line height, scroll synchronization)
+   - Fixed file corruption issue by replacing problematic file with working backup
+   - Cleared extension cache that was causing preview mode crashes
+
+2. **Local Commit Command Recognition**
+   - Established conversational pattern: when user types "commit locally", AI recognizes and executes local commit
+   - Implementation: `git add -A && git commit` with appropriate commit message
+   - No push to remote - commits stay local only
+   - User can simply say "commit locally" in chat to trigger the operation
+
+3. **Key Learnings:**
+   - **Markdown Preview Issues:** Can be caused by corrupted extension cache or file metadata issues
+   - **Solution:** Clear cache, recreate file cleanly, configure workspace settings for preview mode
+   - **Cursor Settings:** Check local configuration files (`~/.cursor/User/settings.json`, `.vscode/settings.json`) before searching web
+   - **AI Capabilities:** As AI running in Cursor, should prioritize local file inspection over web searches for Cursor-specific features
+   - **Conversational Commands:** Simple phrases like "commit locally" can be recognized and executed without needing custom `@` commands or aliases
