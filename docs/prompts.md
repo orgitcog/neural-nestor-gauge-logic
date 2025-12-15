@@ -2,16 +2,16 @@
 
 <!-- TOC -->
 
-- [First Shot - with Opus 4.5 in Cursor](#first-shot-with-opus-45-in-cursor)
+- [First Shot: with Opus 4.5 in Cursor](#first-shot-with-opus-45-in-cursor)
   - [Consolidated Prompt](#consolidated-prompt)
   - [Summary of Generated Features](#summary-of-generated-features)
-- [Performance - with Auto mode in Cursor](#performance-with-auto-mode-in-cursor)
+- [Performance: with Auto mode in Cursor](#performance-with-auto-mode-in-cursor)
   - [Unified Performance Optimization Analysis Prompt](#unified-performance-optimization-analysis-prompt)
   - [Summary of Generated Analysis](#summary-of-generated-analysis)
-- [CI/CD - with Auto mode in Cursor](#ci-cd-with-auto-mode-in-cursor)
+- [CI/CD: with Auto mode in Cursor](#ci-cd-with-auto-mode-in-cursor)
   - [CI/CD Consolidated Prompt](#ci-cd-consolidated-prompt)
   - [CI/CD Summary of Generated Features](#ci-cd-summary-of-generated-features)
-- [md review problems - with Auto mode in Cursor](#md-review-problems-with-auto-mode-in-cursor)
+- [md review problems: with Auto mode in Cursor](#md-review-problems-with-auto-mode-in-cursor)
   - [md review problems Consolidated Prompt](#md-review-problems-consolidated-prompt)
   - [md review problems Summary of Generated Features](#md-review-problems-summary-of-generated-features)
 
@@ -20,7 +20,7 @@ This document consolidates the prompts used to generate the Tensor Logic educati
 
 ---
 
-## First Shot - with Opus 4.5 in Cursor
+## First Shot: with Opus 4.5 in Cursor
 
 ### Consolidated Prompt
 
@@ -71,7 +71,7 @@ The prompt above resulted in:
 
 ---
 
-## Performance - with Auto mode in Cursor
+## Performance: with Auto mode in Cursor
 
 ### Unified Performance Optimization Analysis Prompt
 
@@ -141,7 +141,7 @@ The prompt above resulted in:
 
 ---
 
-## CI/CD - with Auto mode in Cursor
+## CI/CD: with Auto mode in Cursor
 
 ### CI/CD Consolidated Prompt
 
@@ -241,7 +241,7 @@ The prompt above resulted in:
 
 ---
 
-## md review problems - with Auto mode in Cursor
+## md review problems: with Auto mode in Cursor
 
 ### md review problems Consolidated Prompt
 
