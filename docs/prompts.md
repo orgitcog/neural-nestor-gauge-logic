@@ -8,6 +8,9 @@
 - [Performance - with Auto mode in Cursor](#performance-with-auto-mode-in-cursor)
   - [Unified Performance Optimization Analysis Prompt](#unified-performance-optimization-analysis-prompt)
   - [Summary of Generated Analysis](#summary-of-generated-analysis)
+- [CI/CD - with Auto mode in Cursor](#cicd-with-auto-mode-in-cursor)
+  - [Consolidated Prompt](#consolidated-prompt)
+  - [Summary of Generated Features](#summary-of-generated-features)
 
 <!-- /TOC -->
 This document consolidates the prompts used to generate the Tensor Logic educational web application.
@@ -132,3 +135,103 @@ The prompt above resulted in:
    - Created `README_dev.md` for development setup
    - Reorganized main `README.md` to focus on project overview
    - All documentation cross-referenced and properly linked
+
+---
+
+## CI/CD - with Auto mode in Cursor
+
+### Consolidated Prompt
+
+> Set up a complete CI/CD pipeline for the Tensor Logic project with the following requirements:
+>
+> **Build Timestamp Feature:**
+> - Add a date/time-stamp version string in "YYYY-MM-DD_HH:MM" format to the bottom of the sidebar
+> - The timestamp should reflect when the app was most recently built and update on every build
+> - Add a mailto link on the same line: "Questions? Comment? Please email me." with address "sam@samkirk.com"
+>
+> **GitHub Actions CI Setup:**
+> - Create a GitHub Actions workflow that runs on every push to `main`/`master` and on pull requests
+> - The workflow should:
+>   - Run TypeScript type checking (`tsc --noEmit`)
+>   - Run ESLint linting
+>   - Build the application (`vite build`)
+>   - Build TypeScript scripts (`tsc -p tsconfig.scripts.json`)
+>   - Upload build artifacts for 7 days
+> - Use Node.js 20 with npm caching
+> - Ensure the workflow file is properly configured and will trigger automatically
+>
+> **Repository Setup:**
+> - Rename the local branch from `samkirk` to `main` to match GitHub's default
+> - Set up SSH authentication with 1Password for seamless credential management
+> - Configure git to use SSH instead of HTTPS (no credential prompts)
+> - Connect local repository to GitHub remote
+>
+> **Documentation:**
+> - Create comprehensive CI/CD setup guide (`docs/CI_CD.md`) that includes:
+>   - Step-by-step instructions for GitHub Actions CI setup
+>   - Instructions for getting GitHub Personal Access Token (for Cursor MCP)
+>   - SSH authentication setup with 1Password (preferred method)
+>   - Repository creation and connection steps
+>   - Workflow configuration and troubleshooting
+>   - Deployment instructions for Shuttle.dev
+>   - Clear explanations of when CI runs and how to control it
+> - Use "MrBesterTester" as the GitHub username in examples
+> - Prioritize SSH over HTTPS in all instructions
+> - Include helpful tips (e.g., refreshing browser to see new workflow runs)
+>
+> **Code Quality:**
+> - Fix any lint errors (e.g., use `@ts-expect-error` instead of `@ts-ignore` when needed)
+> - Ensure all TypeScript code compiles without errors
+> - Remove unused directives when TypeScript declarations make them unnecessary
+>
+> **Testing:**
+> - Verify the CI workflow runs successfully on GitHub
+> - Ensure build artifacts are generated and uploaded correctly
+> - Test that the workflow triggers automatically on pushes
+
+### Summary of Generated Features
+
+The prompt above resulted in:
+
+1. **Build Timestamp Feature** (`src/main.ts`, `vite.config.ts`, `src/vite-env.d.ts`)
+   - Build timestamp in `YYYY-MM-DD_HH:MM` format injected at build time via Vite
+   - Displayed in sidebar footer with mailto link on the same line
+   - TypeScript declaration file for `__BUILD_TIME__` global constant
+   - Proper styling with flexbox layout
+
+2. **GitHub Actions CI Workflow** (`.github/workflows/ci.yml`)
+   - Automated CI pipeline running on push to `main`/`master` and pull requests
+   - Steps: checkout, Node.js 20 setup, dependency installation, linting, type checking, builds
+   - Build artifacts uploaded and retained for 7 days
+   - Successfully tested and passing
+
+3. **Repository Configuration**
+   - Branch renamed from `samkirk` to `main`
+   - SSH authentication configured with 1Password SSH Agent
+   - Git remote switched from HTTPS to SSH (`git@github.com:MrBesterTester/tensor-logic.git`)
+   - Credential helper disabled to work seamlessly with 1Password
+
+4. **Comprehensive CI/CD Documentation** (`docs/CI_CD.md`)
+   - 524-line complete setup guide with:
+     - Step 0: GitHub Personal Access Token setup (for Cursor MCP)
+     - Step 1: Workflow file creation
+     - Step 2: GitHub Secrets configuration
+     - Step 3: Repository creation and connection (SSH preferred)
+     - Step 3.5: SSH authentication setup with 1Password (detailed instructions)
+     - Step 4: Push and test workflow
+   - Deployment instructions for Shuttle.dev
+   - Workflow configuration details (what gets tested, when CI runs, how to skip)
+   - Troubleshooting section
+   - All examples use "MrBesterTester" as GitHub username
+
+5. **Code Quality Improvements**
+   - Fixed lint errors (replaced `@ts-ignore` with `@ts-expect-error`)
+   - Removed unused TypeScript directives when declarations made them unnecessary
+   - All code passes linting and type checking
+
+6. **Key Features of the Documentation:**
+   - SSH authentication prioritized over HTTPS
+   - Clear step-by-step instructions with code examples
+   - Helpful tips (e.g., refreshing browser to see new workflow runs)
+   - Troubleshooting guidance
+   - Visual workflow diagram showing local → CI → deployment flow
