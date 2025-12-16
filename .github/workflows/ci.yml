@@ -31,8 +31,8 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch || 'main' }}
-          head: HEAD
+          base: ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}
+          head: ${{ github.event.pull_request.head.sha || github.event.after || 'HEAD' }}
         continue-on-error: true
         
       - name: Run linter
