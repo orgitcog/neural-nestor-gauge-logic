@@ -2,15 +2,27 @@ import { defineConfig } from 'vite';
 
 // Generate build timestamp in format YYYY-MM-DD_HH:MM
 // Convert to PST/PDT (America/Los_Angeles timezone) for display
+// GitHub Actions runs in UTC, so we convert to PST/PDT
 function getBuildTimestamp(): string {
   const now = new Date();
-  // Convert to PST/PDT timezone
-  const pstTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-  const year = pstTime.getFullYear();
-  const month = String(pstTime.getMonth() + 1).padStart(2, '0');
-  const day = String(pstTime.getDate()).padStart(2, '0');
-  const hours = String(pstTime.getHours()).padStart(2, '0');
-  const minutes = String(pstTime.getMinutes()).padStart(2, '0');
+  // Format the date in PST/PDT timezone
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+  
+  const parts = formatter.formatToParts(now);
+  const year = parts.find(p => p.type === 'year')?.value || '';
+  const month = parts.find(p => p.type === 'month')?.value || '';
+  const day = parts.find(p => p.type === 'day')?.value || '';
+  const hours = parts.find(p => p.type === 'hour')?.value || '';
+  const minutes = parts.find(p => p.type === 'minute')?.value || '';
+  
   return `${year}-${month}-${day}_${hours}:${minutes}`;
 }
 
