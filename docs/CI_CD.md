@@ -36,7 +36,7 @@
   - [Prerequisites](#prerequisites)
   - [Setup Procedure (Automated)](#setup-procedure-automated)
   - [Manual Procedures](#manual-procedures)
-  - [Troubleshooting](#troubleshooting)
+  - [Troubleshooting Domain Setup](#troubleshooting-domain-setup)
   - [SSL Certificate Management](#ssl-certificate-management)
   - [Cost Considerations](#cost-considerations)
   - [Quick Reference Card](#quick-reference-card)
@@ -1073,7 +1073,7 @@ curl -I https://tensor-logic.samkirk.com
 # Visit: https://tensor-logic.samkirk.com
 ```
 
-### Troubleshooting
+### Troubleshooting Domain Setup
 
 **Problem: "shuttle certificate add" Fails**
 

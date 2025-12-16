@@ -13,7 +13,7 @@
  *   node scripts/dist/check-dns-propagation.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app
  */
 
-import { execSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import * as process from 'process';
 
 interface DNSResult {
@@ -26,12 +26,31 @@ interface DNSResult {
 
 function checkDNSCNAME(domain: string): DNSResult {
   try {
-    const output = execSync(`dig CNAME +short ${domain}`, { encoding: 'utf-8' });
-    const result = output.trim();
+    // Use spawnSync with array arguments to prevent command injection
+    // Validate domain contains only safe characters (alphanumeric, dots, hyphens)
+    if (!/^[a-zA-Z0-9.-]+$/.test(domain)) {
+      return {
+        domain,
+        target: '',
+        found: false,
+        error: 'Invalid domain format',
+      };
+    }
+    const result = spawnSync('dig', ['CNAME', '+short', domain], { encoding: 'utf-8' });
+    if (result.error || result.status !== 0) {
+      return {
+        domain,
+        target: '',
+        found: false,
+        error: result.error?.message || 'dig command failed',
+      };
+    }
+    const output = result.stdout?.toString() || '';
+    const trimmed = output.trim();
     
-    if (result) {
+    if (trimmed) {
       // Remove trailing dot if present
-      const cname = result.replace(/\.$/, '');
+      const cname = trimmed.replace(/\.$/, '');
       return {
         domain,
         target: '', // Will be set by caller

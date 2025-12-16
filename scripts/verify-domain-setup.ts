@@ -13,7 +13,7 @@
  *   node scripts/dist/verify-domain-setup.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app
  */
 
-import { execSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import * as process from 'process';
 
 interface VerificationResult {
@@ -24,13 +24,22 @@ interface VerificationResult {
 
 function checkDNSCNAME(domain: string): { found: boolean; value?: string } {
   try {
-    const output = execSync(`dig CNAME +short ${domain}`, { encoding: 'utf-8' });
-    const result = output.trim();
+    // Validate domain contains only safe characters (alphanumeric, dots, hyphens)
+    if (!/^[a-zA-Z0-9.-]+$/.test(domain)) {
+      return { found: false };
+    }
+    // Use spawnSync with array arguments to prevent command injection
+    const result = spawnSync('dig', ['CNAME', '+short', domain], { encoding: 'utf-8' });
+    if (result.error || result.status !== 0) {
+      return { found: false };
+    }
+    const output = result.stdout?.toString() || '';
+    const trimmed = output.trim();
     
-    if (result) {
+    if (trimmed) {
       return {
         found: true,
-        value: result.replace(/\.$/, ''),
+        value: trimmed.replace(/\.$/, ''),
       };
     }
     
@@ -42,7 +51,16 @@ function checkDNSCNAME(domain: string): { found: boolean; value?: string } {
 
 function checkDNSResolution(domain: string): { resolved: boolean; ips?: string[] } {
   try {
-    const output = execSync(`dig +short ${domain}`, { encoding: 'utf-8' });
+    // Validate domain contains only safe characters (alphanumeric, dots, hyphens)
+    if (!/^[a-zA-Z0-9.-]+$/.test(domain)) {
+      return { resolved: false };
+    }
+    // Use spawnSync with array arguments to prevent command injection
+    const result = spawnSync('dig', ['+short', domain], { encoding: 'utf-8' });
+    if (result.error || result.status !== 0) {
+      return { resolved: false };
+    }
+    const output = result.stdout?.toString() || '';
     const ips = output.trim().split('\n').filter(line => line && !line.includes('CNAME'));
     
     if (ips.length > 0) {
@@ -60,7 +78,16 @@ function checkDNSResolution(domain: string): { resolved: boolean; ips?: string[]
 
 function checkHTTPAccess(domain: string): { accessible: boolean; statusCode?: number } {
   try {
-    const output = execSync(`curl -s -o /dev/null -w "%{http_code}" -I http://${domain}`, { encoding: 'utf-8' });
+    // Validate domain contains only safe characters (alphanumeric, dots, hyphens)
+    if (!/^[a-zA-Z0-9.-]+$/.test(domain)) {
+      return { accessible: false };
+    }
+    // Use spawnSync with array arguments to prevent command injection
+    const result = spawnSync('curl', ['-s', '-o', '/dev/null', '-w', '%{http_code}', '-I', `http://${domain}`], { encoding: 'utf-8' });
+    if (result.error || result.status !== 0) {
+      return { accessible: false };
+    }
+    const output = result.stdout?.toString() || '';
     const statusCode = parseInt(output.trim(), 10);
     
     return {
@@ -74,7 +101,16 @@ function checkHTTPAccess(domain: string): { accessible: boolean; statusCode?: nu
 
 function checkHTTPSAccess(domain: string): { accessible: boolean; statusCode?: number } {
   try {
-    const output = execSync(`curl -s -o /dev/null -w "%{http_code}" -I https://${domain}`, { encoding: 'utf-8' });
+    // Validate domain contains only safe characters (alphanumeric, dots, hyphens)
+    if (!/^[a-zA-Z0-9.-]+$/.test(domain)) {
+      return { accessible: false };
+    }
+    // Use spawnSync with array arguments to prevent command injection
+    const result = spawnSync('curl', ['-s', '-o', '/dev/null', '-w', '%{http_code}', '-I', `https://${domain}`], { encoding: 'utf-8' });
+    if (result.error || result.status !== 0) {
+      return { accessible: false };
+    }
+    const output = result.stdout?.toString() || '';
     const statusCode = parseInt(output.trim(), 10);
     
     return {
@@ -88,10 +124,19 @@ function checkHTTPSAccess(domain: string): { accessible: boolean; statusCode?: n
 
 function checkSSLCertificate(domain: string): { valid: boolean; expirationDate?: string } {
   try {
-    const output = execSync(
+    // Validate domain contains only safe characters (alphanumeric, dots, hyphens)
+    if (!/^[a-zA-Z0-9.-]+$/.test(domain)) {
+      return { valid: false };
+    }
+    // Use spawnSync with shell for pipe operations, but domain is validated
+    const result = spawnSync(
       `echo | openssl s_client -servername ${domain} -connect ${domain}:443 2>/dev/null | openssl x509 -noout -dates 2>/dev/null`,
-      { encoding: 'utf-8' }
+      { encoding: 'utf-8', shell: true }
     );
+    if (result.error || result.status !== 0) {
+      return { valid: false };
+    }
+    const output = result.stdout?.toString() || '';
     
     const match = output.match(/notAfter=(.+)/);
     if (match && match[1]) {
