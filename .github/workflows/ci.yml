@@ -68,22 +68,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          
-      - name: Build frontend
-        run: |
-          npm ci
-          npm run build
-          
-      - name: Verify dist folder exists
-        run: |
-          ls -la backend/tensor-logic/dist/ || echo "ERROR: dist folder not found!"
-          test -f backend/tensor-logic/dist/index.html || echo "ERROR: index.html not found!"
           
       - name: Deploy to Shuttle
         uses: shuttle-hq/deploy-action@v2
