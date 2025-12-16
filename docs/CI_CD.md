@@ -27,15 +27,19 @@
   - [Deployment Fails](#deployment-fails)
   - [Secrets Not Working](#secrets-not-working)
 - [Next Steps](#next-steps)
+- [Project Scripts](#project-scripts)
+  - [generate-toc.ts](#generate-tocts)
+  - [check-dns-propagation.ts](#check-dns-propagationts)
+  - [verify-domain-setup.ts](#verify-domain-setupts)
 - [Custom Domain Configuration](#custom-domain-configuration)
   - [Overview](#overview)
   - [Prerequisites](#prerequisites)
   - [Automation Support](#automation-support)
   - [Step 1: Get Your Shuttle URL](#step-1-get-your-shuttle-url)
   - [Step 2: Configure DNS at Your Registrar](#step-2-configure-dns-at-your-registrar)
-  - [Step 3: Wait for DNS Propagation](#step-3-wait-for-dns-propagation)
+  - [Step 3: Monitor DNS Propagation](#step-3-monitor-dns-propagation)
   - [Step 4: Add SSL Certificate via Shuttle](#step-4-add-ssl-certificate-via-shuttle)
-  - [Verification](#verification)
+  - [Step 5: Verify Complete Setup](#step-5-verify-complete-setup)
   - [Troubleshooting](#troubleshooting)
   - [SSL Certificate Management](#ssl-certificate-management)
   - [Cost Considerations](#cost-considerations)
@@ -712,6 +716,112 @@ git push
 
 ---
 
+## Project Scripts
+
+This project includes several automation scripts in the `scripts/` directory. All scripts are written in TypeScript with strict type checking and must be built before use.
+
+**Note:** All scripts in this directory are written in TypeScript with strict type checking. When creating new scripts, use TypeScript and ensure they compile with `npm run build:scripts`.
+
+### generate-toc.ts
+
+Automatically generates a 3-level Table of Contents (TOC) for Markdown files.
+
+**Usage:**
+
+The script is written in TypeScript and must be built first:
+
+```bash
+npm run build:scripts
+node scripts/dist/generate-toc.js <path-to-markdown-file>
+```
+
+Or use the TypeScript source directly with a TypeScript runner (if you have one installed):
+
+```bash
+npx tsx scripts/generate-toc.ts <path-to-markdown-file>
+```
+
+**Features:**
+
+- Generates TOC for H1, H2, and H3 headings
+- Automatically inserts/updates TOC between `<!-- TOC -->` and `<!-- /TOC -->` markers
+- Creates anchor links using slugified heading text
+- Preserves existing TOC if markers are present, otherwise inserts after first H1
+
+**Git Hook:**
+
+A pre-commit hook is installed at `.git/hooks/pre-commit` that automatically generates TOCs for all staged `.md` files before each commit.
+
+**Manual TOC Generation:**
+
+To manually generate TOC for all markdown files:
+
+```bash
+npm run build:scripts
+find docs -name "*.md" -exec node scripts/dist/generate-toc.js {} \;
+```
+
+### check-dns-propagation.ts
+
+Monitors DNS propagation for a CNAME record. Polls DNS servers until the record is found or timeout is reached.
+
+**Usage:**
+
+```bash
+npm run build:scripts
+node scripts/dist/check-dns-propagation.js <domain> <target>
+```
+
+**Example:**
+```bash
+node scripts/dist/check-dns-propagation.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app
+```
+
+**Features:**
+
+- Checks CNAME record propagation status
+- Polls every 5 minutes (configurable)
+- Maximum 48 attempts (4 hours) by default
+- Provides real-time status updates
+- Exits when propagation is complete or timeout reached
+
+**Options:**
+- `intervalSeconds`: Time between checks (default: 300 seconds / 5 minutes)
+- `maxAttempts`: Maximum number of attempts (default: 48)
+
+### verify-domain-setup.ts
+
+Comprehensive verification script that checks all aspects of custom domain configuration for Shuttle deployments.
+
+**Usage:**
+
+```bash
+npm run build:scripts
+node scripts/dist/verify-domain-setup.js <domain> <shuttle-url>
+```
+
+**Example:**
+```bash
+node scripts/dist/verify-domain-setup.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app
+```
+
+**Features:**
+
+- **DNS Resolution Check:** Verifies domain resolves to IP addresses
+- **CNAME Record Check:** Verifies CNAME points to correct Shuttle URL
+- **HTTP Access Check:** Tests HTTP connectivity
+- **HTTPS Access Check:** Tests HTTPS connectivity
+- **SSL Certificate Check:** Verifies SSL certificate is valid and shows expiration date
+- Provides comprehensive status report with pass/fail indicators
+
+**Output:**
+- ✅ Green checkmarks for passing checks
+- ⚠️ Warning indicators for potential issues
+- ❌ Red X for failing checks
+- Detailed messages for each check
+
+---
+
 ## Custom Domain Configuration
 
 ### Overview
@@ -747,18 +857,16 @@ User → tensor-logic.samkirk.com
 <Note>
 **Chatbot Assistance:** The chatbot can help with:
 - Getting your Shuttle URL automatically using `shuttle project status`
-- Verifying DNS propagation using `dig` or `nslookup` commands
+- Running DNS propagation monitoring script
 - Adding SSL certificate via `shuttle certificate add` command
-- Creating verification scripts to check DNS and SSL status
+- Running verification scripts to check DNS and SSL status
 
-**Automation Scripts:** The following can be automated via scripts in `scripts/`:
-- DNS propagation checker script
-- SSL certificate verification script
-- End-to-end domain setup verification script
+**Automation Scripts:** The following scripts are available in `scripts/`:
+- `check-dns-propagation.ts` - Monitor DNS propagation automatically
+- `verify-domain-setup.ts` - Complete domain verification
 
 **Manual Steps Required:**
 - Adding CNAME record in Microsoft 365 Admin Center or Azure DNS (requires web UI access)
-- Waiting for DNS propagation (cannot be automated, but can be monitored)
 </Note>
 
 ### Step 1: Get Your Shuttle URL
@@ -782,7 +890,7 @@ Project info:
     - https://tensor-logic-noo5.shuttle.app
 ```
 
-**Automation:** The chatbot can run this command automatically to get the current Shuttle URL.
+**Automation:** The chatbot can run this command automatically to get the current Shuttle URL. The URL will be needed for the DNS propagation and verification scripts.
 
 ### Step 2: Configure DNS at Your Registrar
 
@@ -853,18 +961,36 @@ az network dns record-set cname show \
   --name tensor-logic
 ```
 
-**Automation:** The chatbot can help generate the Azure CLI commands if you provide the resource group name. A script can be created in `scripts/` to automate this process.
+**Automation:** The chatbot can help generate the Azure CLI commands if you provide the resource group name.
 
-### Step 3: Wait for DNS Propagation
+### Step 3: Monitor DNS Propagation
 
-DNS changes take time to propagate globally.
+DNS changes take time to propagate globally. Use the automated script to monitor propagation:
 
 **Timeline:**
 - **Minimum:** 5-10 minutes
 - **Typical:** 1-4 hours
 - **Maximum:** 24-48 hours (rare)
 
-**Check Propagation Status:**
+**Using the DNS Propagation Script:**
+
+```bash
+# Build scripts first
+npm run build:scripts
+
+# Run DNS propagation monitor
+node scripts/dist/check-dns-propagation.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app
+```
+
+The script will:
+- Check if DNS has already propagated (exits immediately if found)
+- Poll every 5 minutes until the CNAME record is found
+- Continue for up to 4 hours (48 attempts) by default
+- Exit when propagation is complete or timeout is reached
+
+**Manual Check (Alternative):**
+
+If you prefer to check manually:
 
 ```bash
 # Mac/Linux - check CNAME record
@@ -883,12 +1009,7 @@ nslookup -type=CNAME tensor-logic.samkirk.com
 
 Search for: `tensor-logic.samkirk.com` (Type: CNAME)
 
-**Automation:** A script can be created in `scripts/check-dns-propagation.sh` that:
-- Checks DNS propagation using `dig`
-- Polls every 5 minutes until propagation is complete
-- Notifies when ready to proceed with SSL certificate
-
-**Chatbot Assistance:** The chatbot can run `dig` commands to check DNS propagation status on demand.
+**Chatbot Assistance:** The chatbot can run the DNS propagation script automatically for you.
 
 ### Step 4: Add SSL Certificate via Shuttle
 
@@ -911,59 +1032,76 @@ https://tensor-logic.samkirk.com
 **If it Fails:**
 - **Error:** "DNS validation failed"
 - **Cause:** DNS hasn't propagated yet
-- **Solution:** Wait another hour and try again, or use the DNS propagation checker script
+- **Solution:** Wait and retry, or use the DNS propagation script to monitor status
 
-**Verify HTTPS is Working:**
+**Automation:** The chatbot can run `shuttle certificate add` automatically once DNS propagation is confirmed.
+
+### Step 5: Verify Complete Setup
+
+Use the comprehensive verification script to check all aspects of your domain configuration:
+
+**Using the Verification Script:**
+
 ```bash
-curl -I https://tensor-logic.samkirk.com
+# Build scripts first (if not already built)
+npm run build:scripts
+
+# Run complete domain verification
+node scripts/dist/verify-domain-setup.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app
 ```
 
-Should return `200 OK` with HTTPS.
+The script will automatically check:
+1. **DNS Resolution** - Verifies domain resolves to IP addresses
+2. **CNAME Record** - Verifies CNAME points to correct Shuttle URL
+3. **HTTP Access** - Tests HTTP connectivity
+4. **HTTPS Access** - Tests HTTPS connectivity
+5. **SSL Certificate** - Verifies SSL certificate is valid and shows expiration date
 
-**Automation:** The chatbot can run `shuttle certificate add` automatically once DNS propagation is confirmed. A script can be created to automate the entire SSL certificate setup process.
+**Expected Output:**
+```
+🔍 Verifying domain setup for: tensor-logic.samkirk.com
+   Expected Shuttle URL: tensor-logic-noo5.shuttle.app
 
-### Verification
+1. Checking DNS resolution...
+2. Checking CNAME record...
+3. Checking HTTP access...
+4. Checking HTTPS access...
+5. Checking SSL certificate...
 
-**Step-by-Step Verification:**
+📊 Verification Results:
+────────────────────────────────────────────────────────────
+✅ DNS Resolution: Domain resolves to: <IP addresses>
+✅ CNAME Record: CNAME correctly points to: tensor-logic-noo5.shuttle.app
+✅ HTTP Access: HTTP accessible (status: 200)
+✅ HTTPS Access: HTTPS accessible (status: 200)
+✅ SSL Certificate: SSL certificate valid (expires: <date>)
+────────────────────────────────────────────────────────────
 
-**1. Check DNS Resolution:**
+✅ All checks passed! Domain is properly configured.
+```
+
+**Manual Verification (Alternative):**
+
+If you prefer to verify manually:
+
 ```bash
-# Should return Shuttle's IP addresses
+# 1. Check DNS Resolution
 dig +short tensor-logic.samkirk.com
-```
 
-**2. Check CNAME Record:**
-```bash
-# Should show tensor-logic-noo5.shuttle.app
+# 2. Check CNAME Record
 dig CNAME +short tensor-logic.samkirk.com
-```
 
-**3. Test HTTP Access:**
-```bash
+# 3. Test HTTP Access
 curl -I http://tensor-logic.samkirk.com
-```
 
-**4. Test HTTPS Access:**
-```bash
+# 4. Test HTTPS Access
 curl -I https://tensor-logic.samkirk.com
+
+# 5. Test in Browser
+# Visit: https://tensor-logic.samkirk.com
 ```
 
-Should return `200 OK` with proper headers.
-
-**5. Test in Browser:**
-- Visit: `https://tensor-logic.samkirk.com`
-- Should show your Tensor Logic app
-- Certificate should be valid (no security warnings)
-- URL bar should show `tensor-logic.samkirk.com`
-
-**Automation:** A comprehensive verification script can be created in `scripts/verify-domain-setup.sh` that:
-- Checks DNS resolution
-- Verifies CNAME record
-- Tests HTTP and HTTPS access
-- Checks SSL certificate validity
-- Provides a complete status report
-
-**Chatbot Assistance:** The chatbot can run all verification commands automatically and provide a status report.
+**Chatbot Assistance:** The chatbot can run the verification script automatically and provide a status report.
 
 ### Troubleshooting
 
@@ -981,15 +1119,15 @@ Error: Failed to validate domain ownership
 
 **Solutions:**
 ```bash
-# Check if DNS has propagated
-dig CNAME tensor-logic.samkirk.com
+# Use the DNS propagation script to check status
+npm run build:scripts
+node scripts/dist/check-dns-propagation.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app
 
-# Wait and retry
-sleep 3600  # Wait 1 hour
+# Once propagation is complete, retry certificate
 shuttle certificate add tensor-logic.samkirk.com
 ```
 
-**Automation:** The chatbot can check DNS propagation and retry the certificate command automatically.
+**Automation:** The chatbot can run the DNS propagation script and retry the certificate command automatically once propagation is confirmed.
 
 **Problem: Browser Shows Security Warning**
 
@@ -1017,21 +1155,32 @@ shuttle certificate add tensor-logic.samkirk.com
 **Symptoms:** DNS_PROBE_FINISHED_NXDOMAIN or similar
 
 **Debugging Steps:**
+
+Use the verification script to run all checks automatically:
+
+```bash
+npm run build:scripts
+node scripts/dist/verify-domain-setup.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app
+```
+
+This will check:
+1. CNAME record exists and points to correct Shuttle URL
+2. Shuttle app is running and accessible
+3. DNS resolution from your location
+
+**Manual Checks (Alternative):**
 ```bash
 # 1. Check CNAME record exists
 dig CNAME tensor-logic.samkirk.com
 
-# 2. Check it points to correct Shuttle URL
-# Expected: tensor-logic-noo5.shuttle.app
-
-# 3. Verify Shuttle app is running
+# 2. Verify Shuttle app is running
 curl https://tensor-logic-noo5.shuttle.app
 
-# 4. Check DNS from multiple locations
+# 3. Check DNS from multiple locations
 # Use: https://dnschecker.org/
 ```
 
-**Automation:** A troubleshooting script can be created that runs all these checks automatically.
+**Automation:** The chatbot can run the verification script automatically to diagnose issues.
 
 ### SSL Certificate Management
 
@@ -1055,6 +1204,17 @@ shuttle certificate delete tensor-logic.samkirk.com
 Shuttle automatically renews Let's Encrypt certificates before expiration (typically 90 days). No manual intervention needed.
 
 **To Verify Renewal:**
+
+Use the verification script which includes SSL certificate expiration:
+
+```bash
+npm run build:scripts
+node scripts/dist/verify-domain-setup.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app
+```
+
+The script will show the certificate expiration date in the SSL Certificate check.
+
+**Manual Check (Alternative):**
 ```bash
 # Check certificate expiration
 echo | openssl s_client -servername tensor-logic.samkirk.com \
@@ -1062,7 +1222,7 @@ echo | openssl s_client -servername tensor-logic.samkirk.com \
   openssl x509 -noout -dates
 ```
 
-**Automation:** The chatbot can check certificate expiration dates and renewal status automatically.
+**Automation:** The chatbot can run the verification script to check certificate expiration dates and renewal status automatically.
 
 ### Cost Considerations
 
@@ -1091,21 +1251,20 @@ echo | openssl s_client -servername tensor-logic.samkirk.com \
 - [ ] Add CNAME record at DNS registrar:
   - Host: `tensor-logic`
   - Points to: `tensor-logic-noo5.shuttle.app`
-- [ ] Wait for DNS propagation (1-4 hours)
-- [ ] Verify DNS: `dig CNAME tensor-logic.samkirk.com`
+- [ ] Monitor DNS propagation: `node scripts/dist/check-dns-propagation.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app`
 - [ ] Add SSL: `shuttle certificate add tensor-logic.samkirk.com`
-- [ ] Test: `https://tensor-logic.samkirk.com`
+- [ ] Verify setup: `node scripts/dist/verify-domain-setup.js tensor-logic.samkirk.com tensor-logic-noo5.shuttle.app`
+- [ ] Test in browser: `https://tensor-logic.samkirk.com`
 
 **Automation Scripts Available:**
-- `scripts/check-dns-propagation.sh` - Monitor DNS propagation (can be created)
-- `scripts/verify-domain-setup.sh` - Complete domain verification (can be created)
-- `scripts/setup-ssl-certificate.sh` - Automated SSL certificate setup (can be created)
+- `scripts/check-dns-propagation.ts` - Monitor DNS propagation automatically
+- `scripts/verify-domain-setup.ts` - Complete domain verification
 
 **Chatbot Can Help With:**
 - Getting Shuttle URL automatically
-- Checking DNS propagation status
+- Running DNS propagation monitoring script
 - Adding SSL certificates
-- Running verification commands
+- Running verification script
 - Troubleshooting issues
 
 **Support:**
