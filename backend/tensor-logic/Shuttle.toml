@@ -1,16 +1,9 @@
 # Include dist files in deployment (dist/ is gitignored, so we need to explicitly include it)
-# Also include frontend source files needed for building (relative to backend/tensor-logic)
 # Note: According to Shuttle docs, specifying only a folder name doesn't work - use "dist/*" instead
-# node_modules will be installed via npm ci during shuttle_postbuild.sh
+# The dist folder is built in GitHub Actions before deployment
 [deploy]
 include = [
   "dist/*",
-  "../../package.json",
-  "../../package-lock.json",
-  "../../vite.config.ts",
-  "../../tsconfig.json",
-  "../../tsconfig.scripts.json",
-  "../../src/*",
 ]
 
 # Copy dist files to runtime image
