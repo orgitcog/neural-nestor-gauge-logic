@@ -17,6 +17,9 @@
 - [Security: with Auto mode in Cursor](#security-with-auto-mode-in-cursor)
   - [Security Consolidated Prompt](#security-consolidated-prompt)
   - [Security Summary of Generated Features](#security-summary-of-generated-features)
+- [Deploy: with Auto mode in Cursor](#deploy-with-auto-mode-in-cursor)
+  - [Deploy Consolidated Prompt](#deploy-consolidated-prompt)
+  - [Deploy Summary of Generated Features](#deploy-summary-of-generated-features)
 
 <!-- /TOC -->
 This document consolidates the prompts used to generate the Tensor Logic educational web application.
@@ -482,3 +485,130 @@ The prompt above resulted in:
     - ✅ Subresource Integrity enabled via self-hosting
     - ✅ Comprehensive security documentation as single source of truth
     - ✅ GitHub security settings documented (manual setup required)
+
+---
+
+## Deploy: with Auto mode in Cursor
+
+### Deploy Consolidated Prompt
+
+> Set up automated deployment to Shuttle.dev for the Tensor Logic static frontend application. The project currently has CI/CD configured with GitHub Actions, but needs deployment automation to Shuttle.dev.
+>
+> **Initial Setup:**
+> - Create a minimal Rust backend using Shuttle.dev to serve the static frontend files
+> - Initialize Shuttle project in `backend/tensor-logic/` directory
+> - Configure Vite to build directly to `backend/tensor-logic/dist/` to avoid manual copy steps
+> - Modify Rust backend (`src/main.rs`) to serve static files from the `dist/` directory
+> - Configure `Shuttle.toml` to include the `dist/` folder in deployment
+> - Test deployment locally to verify the setup works
+>
+> **GitHub Actions Deployment:**
+> - Add deployment job to existing CI workflow that runs after `build-and-test` succeeds
+> - Deploy job should only run on pushes to `main` branch (not pull requests)
+> - Build frontend in the deploy job before deploying to Shuttle
+> - Use `shuttle-hq/deploy-action@v2` with correct project ID and working directory
+> - Configure `Shuttle.toml` to include gitignored `dist/` files in deployment archive
+>
+> **Path Resolution:**
+> - Implement reliable path resolution in Rust backend for both local development and Shuttle runtime
+> - Handle the difference between local paths (`dist/`) and Shuttle runtime paths (`/app/dist/`)
+> - Docker build copies `/build_assets` to `/app`, so files are at `/app/dist/` in runtime
+>
+> **Build Timestamp Timezone:**
+> - Fix build timestamp to display in PST/PDT instead of UTC
+> - GitHub Actions runs in UTC, but timestamp should show local timezone for better readability
+> - Use `Intl.DateTimeFormat` with `timeZone: 'America/Los_Angeles'` for proper conversion
+>
+> **Troubleshooting:**
+> - Fix YAML syntax errors in GitHub Actions workflow
+> - Resolve TruffleHog base/head commit comparison issues
+> - Fix artifact upload paths when build output directory changes
+> - Handle Shuttle deployment archive creation (gitignored files must be explicitly included)
+> - Fix runtime path issues (files copied to `/app/dist/` not `/build_assets/dist/`)
+> - Remove unnecessary hook scripts that cause deployment failures
+>
+> **Documentation:**
+> - Update `docs/CI_CD.md` with deployment setup instructions
+> - Document that chatbot can automate most deployment setup steps
+> - Clarify manual steps (e.g., adding GitHub secrets) vs automated steps
+
+### Deploy Summary of Generated Features
+
+The prompt above resulted in:
+
+1. **Shuttle Backend Setup** (`backend/tensor-logic/`)
+   - Created minimal Rust backend using Shuttle Axum template
+   - Configured to serve static files from `dist/` directory
+   - Implemented SPA routing (serve `index.html` for all routes)
+   - Added `tower-http` for static file serving with `ServeDir`
+   - Path resolution handles both local development and Shuttle runtime environments
+
+2. **Vite Build Configuration** (`vite.config.ts`)
+   - Modified `outDir` to build directly to `../backend/tensor-logic/dist`
+   - Eliminates need for manual copy steps
+   - Build timestamp generation with PST/PDT timezone conversion
+   - Uses `Intl.DateTimeFormat` to convert UTC (GitHub Actions) to `America/Los_Angeles` timezone
+
+3. **Shuttle Configuration** (`backend/tensor-logic/Shuttle.toml`)
+   - `[deploy].include = ["dist/*"]` to include gitignored dist files in deployment archive
+   - `[build].assets = ["dist/*"]` to copy dist files to runtime image
+   - Uses `dist/*` pattern (not just `dist`) per Shuttle documentation requirements
+
+4. **Rust Backend Implementation** (`backend/tensor-logic/src/main.rs`)
+   - `get_dist_path()` function with environment-aware path resolution
+   - Local development: uses `current_dir().join("dist")`
+   - Shuttle runtime: uses `/app/dist/` (Docker copies `/build_assets` to `/app`)
+   - Serves static assets from `/assets` route
+   - SPA fallback serves `index.html` for all other routes
+   - Comprehensive error logging for debugging
+
+5. **GitHub Actions Deployment Job** (`.github/workflows/ci.yml`)
+   - Added `deploy` job that runs after `build-and-test` succeeds
+   - Only triggers on pushes to `main` branch (not pull requests)
+   - Builds frontend before deploying
+   - Uses `shuttle-hq/deploy-action@v2` with:
+     - `project-id: proj_01KCJDQWVDRP2A38R07R3M30F4`
+     - `working-directory: backend/tensor-logic`
+     - `extra-args: "--allow-dirty"`
+   - Verification step to confirm dist folder exists before deployment
+
+6. **CI/CD Fixes and Improvements**
+   - Fixed YAML syntax error: separated "Setup Node.js" and "Build frontend" steps
+   - Fixed TruffleHog base/head commit comparison for push events
+   - Updated artifact upload path from `dist/` to `backend/tensor-logic/dist/`
+   - Added `fetch-depth: 0` to checkout for TruffleHog full history access
+
+7. **Deployment Troubleshooting Resolved**
+   - **Issue:** `dist/` folder not found during Shuttle build
+   - **Solution:** Build frontend in GitHub Actions before deployment, include in `[deploy].include`
+   - **Issue:** Hook scripts (`shuttle_postbuild.sh`) trying to access files outside workspace
+   - **Solution:** Removed hook scripts, build frontend in CI instead
+   - **Issue:** Runtime path incorrect (`/build_assets/dist/` vs `/app/dist/`)
+   - **Solution:** Updated path resolution to use `/app/dist/` (where Docker copies files)
+   - **Issue:** Build timestamp showing UTC instead of PST/PDT
+   - **Solution:** Added timezone conversion using `Intl.DateTimeFormat`
+
+8. **Documentation Updates** (`docs/CI_CD.md`)
+   - Added "Setting Up GitHub Actions Deployment" section
+   - Documented that chatbot can automate Step 2 (updating CI workflow)
+   - Clarified manual steps (adding GitHub secrets) vs automated steps
+   - Updated deployment process explanation
+   - Added note about Initial Setup section being fully automatable by chatbot
+
+9. **Key Deployment Achievements:**
+   - ✅ Fully automated CI/CD pipeline from code push to live deployment
+   - ✅ Frontend builds automatically in GitHub Actions
+   - ✅ Shuttle deployment triggered automatically on successful CI
+   - ✅ Static files served correctly in both local and production environments
+   - ✅ Build timestamp displays in PST/PDT timezone for better readability
+   - ✅ No manual deployment steps required after initial setup
+   - ✅ Live deployment at: https://tensor-logic-noo5.shuttle.app
+
+10. **Deployment Workflow:**
+    - Developer pushes code to `main` branch
+    - GitHub Actions runs `build-and-test` job (CI checks)
+    - If CI passes, `deploy` job runs automatically
+    - Deploy job builds frontend (creates `backend/tensor-logic/dist/`)
+    - Shuttle deploy action packages files and deploys to Shuttle
+    - Website updates live within 2-3 minutes
+    - No manual intervention required
