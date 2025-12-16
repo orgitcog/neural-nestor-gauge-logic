@@ -153,7 +153,6 @@ function main() {
     });
 }
 
-if (require.main === module) {
-  main();
-}
+// ES module entry point - call main() directly since this script is meant to be executed
+main();
 
