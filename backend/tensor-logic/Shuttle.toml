@@ -1,0 +1,12 @@
+# Include dist files in deployment
+[deploy]
+include = [
+  "dist/*",
+]
+
+# Copy dist files to runtime image
+[build]
+assets = [
+  "dist/*",
+]
+

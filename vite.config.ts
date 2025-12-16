@@ -17,7 +17,7 @@ export default defineConfig({
     __BUILD_TIME__: JSON.stringify(getBuildTimestamp()),
   },
   build: {
-    outDir: '../dist',
+    outDir: '../backend/tensor-logic/dist',
     emptyOutDir: true,
   },
   server: {

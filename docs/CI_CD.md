@@ -12,8 +12,10 @@
   - [Step 3.5: Set Up SSH Authentication (Optional but Recommended)](#step-35-set-up-ssh-authentication-optional-but-recommended)
   - [Step 4: Push and Test](#step-4-push-and-test)
 - [Deployment to Shuttle](#deployment-to-shuttle)
+  - [How Shuttle Connects to GitHub](#how-shuttle-connects-to-github)
   - [Prerequisites](#prerequisites)
   - [Initial Setup](#initial-setup)
+  - [Setting Up GitHub Actions Deployment](#setting-up-github-actions-deployment)
   - [Deployment Process](#deployment-process)
 - [Workflow Configuration](#workflow-configuration)
   - [What Gets Tested](#what-gets-tested)
@@ -35,7 +37,7 @@ This guide provides step-by-step instructions for setting up:
 1. **GitHub Actions CI** - Automated testing on every push
 2. **Shuttle Deployment** - Deploy the static site to Shuttle.dev
 
-**Key Principle:** CI runs tests automatically, but deployment is manual and controlled by you.
+**Key Principle:** CI runs tests automatically on every push. Deployment can be automatic via GitHub Actions (recommended) or manual via CLI - you control which approach to use.
 
 ---
 
@@ -63,18 +65,22 @@ This guide provides step-by-step instructions for setting up:
 │  6. Reports: ✅ PASS or ❌ FAIL                             │
 └─────────────────┬───────────────────────────────────────────┘
                   │
-                  │ (CI passes, ready to deploy)
+                  │ (CI passes, on main branch)
                   │
-                  │ YOU DECIDE: Deploy now?
-                  │
-                  │ Manual: shuttle deploy
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  SHUTTLE PRODUCTION                                         │
+│  GITHUB ACTIONS DEPLOYMENT                                  │
 │                                                              │
-│  7. Deploy: shuttle deploy                                  │
-│  8. App is live at: https://your-app.shuttle.app           │
+│  7. Automatically runs (if configured):                    │
+│     - Builds frontend (npm run build)                      │
+│     - Deploys to Shuttle (shuttle deploy)                  │
+│  8. App is live at: https://your-app.shuttle.app          │
 └─────────────────────────────────────────────────────────────┘
+
+Alternative: Manual Deployment
+────────────────────────────────
+After CI passes, you can also deploy manually:
+  cd backend && shuttle deploy
 ```
 
 ---
@@ -302,9 +308,27 @@ Using SSH with 1Password eliminates credential prompts and provides seamless aut
 
 ## Deployment to Shuttle
 
+### How Shuttle Connects to GitHub
+
+Shuttle offers **two ways** to deploy from GitHub:
+
+1. **GitHub Integration (via Shuttle Console)** - Shuttle automatically pulls code from GitHub
+   - ✅ Simple setup through web console
+   - ✅ Automatic deployments on push (if enabled)
+   - ❌ **Not suitable for this project** - requires code to be ready to deploy without build steps
+   - ❌ This project needs `npm run build` before deployment
+
+2. **GitHub Actions** - Use CI workflow to build and deploy
+   - ✅ Perfect for projects that need build steps (like this one)
+   - ✅ Build happens in GitHub Actions, then deploys to Shuttle
+   - ✅ Full control over build process
+   - ✅ **Recommended for this project**
+
+**For this project:** Since we need to run `npm run build` before deployment, we'll use **GitHub Actions** to handle both building and deploying.
+
 ### Prerequisites
 
-1. **Install Shuttle CLI:**
+1. **Install Shuttle CLI (for initial setup and testing):**
    ```bash
    cargo install cargo-shuttle
    ```
@@ -313,19 +337,30 @@ Using SSH with 1Password eliminates credential prompts and provides seamless aut
    ```bash
    shuttle login
    ```
+   This opens your browser to authenticate. Save your API key when prompted.
 
-3. **Verify installation:**
+3. **Get your Shuttle API Key:**
+   - After logging in, get your API key from: https://console.shuttle.dev/account/api-keys
+   - You'll need this for the GitHub Actions workflow
+
+4. **Create a project and get your Project ID:**
    ```bash
-   shuttle --version
+   # Create a new project
+   shuttle project create --name tensor-logic
+   
+   # Or list existing projects to see their IDs
+   shuttle project list
    ```
+   - Project ID starts with `proj_` (e.g., `proj_0123456789`)
+   - You'll need this ID for the GitHub Actions workflow
 
 ### Initial Setup
 
-Since this is a **static frontend project** (not a Rust backend), you have two options:
+<Note>
+**Chatbot Assistance:** The entire Initial Setup section (Steps 1-4) can be handled automatically by asking the chatbot/AI assistant to "do Initial Setup" or "set up the Shuttle backend". The chatbot will create the backend directory, initialize the Shuttle project, configure the Rust code to serve static files, and set up the necessary files.
+</Note>
 
-#### Option A: Deploy as Static Site (Recommended)
-
-Shuttle can serve static files. You'll need to create a minimal Rust backend that serves the built files:
+Since this is a **static frontend project** (not a Rust backend), you need to create a minimal Rust backend that serves the built files:
 
 1. **Create a backend directory:**
    ```bash
@@ -339,38 +374,167 @@ Shuttle can serve static files. You'll need to create a minimal Rust backend tha
    ```
 
 3. **Modify to serve static files:**
-   - Update `src/main.rs` to serve files from `../dist`
+   - Update `src/main.rs` to serve files from `dist` (files are built directly to `backend/tensor-logic/dist/`)
    - Configure routing for SPA (serve `index.html` for all routes)
 
-4. **Add deployment script:**
+4. **Test deployment locally (optional):**
    ```bash
    # In project root
    npm run build
-   cd backend
+   cd backend/tensor-logic
    shuttle deploy
    ```
 
-#### Option B: Use Shuttle Static (if available)
+### Setting Up GitHub Actions Deployment
 
-If Shuttle offers a static site hosting service:
-```bash
-shuttle deploy --static dist/
-```
+To deploy automatically from GitHub Actions:
+
+1. **Add Shuttle secrets to GitHub:**
+   - Go to: `https://github.com/MrBesterTester/tensor-logic/settings/secrets/actions`
+   - Click "New repository secret"
+   - Add `SHUTTLE_API_KEY` with your API key from Shuttle Console
+   - Add any other secrets your project needs
+
+2. **Update your CI workflow** to include deployment:
+
+   **File:** `.github/workflows/ci.yml`
+
+   Add a deployment job after the build job:
+
+   ```yaml
+   name: CI
+
+   on:
+     push:
+       branches: [ main, master ]
+     pull_request:
+       branches: [ main, master ]
+
+   jobs:
+     build-and-test:
+       runs-on: ubuntu-latest
+       
+       steps:
+         - name: Checkout code
+           uses: actions/checkout@v4
+           
+         - name: Setup Node.js
+           uses: actions/setup-node@v4
+           with:
+             node-version: '20'
+             cache: 'npm'
+             
+         - name: Install dependencies
+           run: npm ci
+           
+         - name: Run linter
+           run: npm run lint
+           
+         - name: Run type check
+           run: npm run typecheck
+           
+         - name: Type check scripts
+           run: npm run typecheck:scripts
+           
+         - name: Build application
+           run: npm run build
+           
+         - name: Build scripts
+           run: npm run build:scripts
+           
+         - name: Upload build artifacts
+           uses: actions/upload-artifact@v4
+           with:
+             name: dist
+             path: dist/
+             retention-days: 7
+
+     deploy:
+       needs: build-and-test
+       runs-on: ubuntu-latest
+       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+       
+       steps:
+         - name: Checkout code
+           uses: actions/checkout@v4
+           
+         - name: Setup Rust
+           uses: actions-rs/toolchain@v1
+           with:
+             toolchain: stable
+             
+         - name: Install cargo-shuttle
+           run: cargo install cargo-shuttle
+           
+         - name: Build frontend
+           uses: actions/setup-node@v4
+           with:
+             node-version: '20'
+             cache: 'npm'
+           run: |
+             npm ci
+             npm run build
+             
+         - name: Deploy to Shuttle
+           uses: shuttle-hq/deploy-action@v2
+           with:
+             shuttle-api-key: ${{ secrets.SHUTTLE_API_KEY }}
+             project-id: proj_YOUR_PROJECT_ID_HERE
+             working-directory: backend/tensor-logic
+   ```
+
+   **Important:** Replace `proj_YOUR_PROJECT_ID_HERE` with your actual Shuttle project ID.
+
+3. **Alternative: Use Shuttle Deploy Action (simpler):**
+
+   If you prefer, you can use the official Shuttle deploy action which handles Rust setup:
+
+   ```yaml
+   - name: Build frontend
+     uses: actions/setup-node@v4
+     with:
+       node-version: '20'
+       cache: 'npm'
+     run: |
+       npm ci
+       npm run build
+       
+   - name: Deploy to Shuttle
+     uses: shuttle-hq/deploy-action@v2
+     with:
+       shuttle-api-key: ${{ secrets.SHUTTLE_API_KEY }}
+       project-id: proj_YOUR_PROJECT_ID_HERE
+       working-directory: backend/tensor-logic
+       extra-args: "--allow-dirty"
+   ```
 
 ### Deployment Process
 
-**Standard workflow:**
+**How it works:**
+
+1. **You push code to GitHub** → `git push origin main`
+2. **GitHub Actions runs CI** → Tests and builds your app
+3. **If CI passes and on main branch** → Deployment job runs automatically
+4. **Deployment job:**
+   - Checks out code
+   - Builds frontend (`npm run build`)
+   - Deploys to Shuttle using `shuttle deploy`
+5. **Your app is live** at your Shuttle URL
+
+**Manual deployment (for testing):**
+
+If you want to deploy manually from your local machine:
 
 ```bash
 # 1. Ensure CI passed (check GitHub Actions)
 #    Go to: https://github.com/MrBesterTester/tensor-logic/actions
 #    Verify: Latest run shows green ✅
 
-# 2. Build locally (optional, CI already did this)
+# 2. Build locally
 npm run build
 
 # 3. Deploy to Shuttle
-cd backend  # If using Option A
+cd backend
 shuttle deploy
 
 # 4. Verify deployment
@@ -379,8 +543,8 @@ shuttle deploy
 
 **Timeline:**
 - CI runs: ~2-3 minutes after push
-- Deployment: ~2-5 minutes after `shuttle deploy`
-- Total: You control both steps independently
+- Deployment (via GitHub Actions): ~2-5 minutes after CI passes
+- Manual deployment: ~2-5 minutes after `shuttle deploy`
 
 ---
 
