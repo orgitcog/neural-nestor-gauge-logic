@@ -1,10 +1,22 @@
-# Tensor Logic Demo
+<div align="center">
+
+# Tensor Logic Demo by Sam Kirk
+
+</div>
+
+An interactive educational demo of **Pedro Domingos' Tensor Logic** — a programming paradigm that unifies neural and symbolic AI at a fundamental level.
+
+Based on the paper: [Tensor Logic: The Language of AI](https://arxiv.org/abs/2510.12269) by Prof. Emeritus Pedro Domingos (University of Washington)
+
+And inspired by Dr. Tim Scarfe's 2 minute demo (with co-host Dr. Keith Duggar) on the interview of Prof. Domingos on Machine Learning Street Talk's YouTube channel: [Tensor Logic "Unifies" AI Paradigms - Pedro Domingos](https://youtu.be/4APMGvicmxY?si=T0ic6RgZ-epTPBMt&t=1070)
+
+![Tensor Logic Demo Screenshot](Screen%20Shot%202025-12-16%20at%2017.18.20.png)
 
 <!-- TOC -->
 
 - [The Core Insight](#the-core-insight)
 - [Demo Features](#demo-features)
-  - [7 Interactive Examples](#7-interactive-examples)
+  - [8 Interactive Examples](#8-interactive-examples)
   - [Core Tensor Logic Engine](#core-tensor-logic-engine)
 - [What This Unifies](#what-this-unifies)
   - [Symbolic AI](#symbolic-ai)
@@ -18,9 +30,6 @@
 - [License](#license)
 
 <!-- /TOC -->
-An interactive educational demo of **Pedro Domingos' Tensor Logic** — a programming paradigm that unifies neural and symbolic AI at a fundamental level.
-
-Based on the paper: [Tensor Logic: The Language of AI](https://arxiv.org/abs/2510.12269) by Prof. Emeritus Pedro Domingos (University of Washington)
 
 ## The Core Insight
 
@@ -40,21 +49,25 @@ This unification allows expressing both symbolic AI and neural networks in the s
 
 ## Demo Features
 
-### 7 Interactive Examples
+### 8 Interactive Examples
 
 1. **Logic Programming (Symbolic AI)**: The classic Ancestor/Parent example showing how Datalog rules map to Einstein summation
 
 2. **Multi-Layer Perceptron (Neural Networks)**: XOR problem demonstrating how MLP layers are tensor contractions
 
-3. **Transformer Self-Attention (Neural Networks)**: Full attention mechanism with Query, Key, Value projections
+3. **MLP Batch Processing (Neural Networks)**: Batch processing of all XOR inputs, showing parallel computation across multiple examples
 
-4. **Multi-Head Attention (Neural Networks)**: Parallel attention heads attending to different aspects
+4. **Transformer Self-Attention (Neural Networks)**: Full attention mechanism with Query, Key, Value projections
 
-5. **Kernel Machines/SVM (Hybrid)**: RBF kernel classification on XOR data
+5. **Multi-Head Attention (Neural Networks)**: Parallel attention heads attending to different aspects
 
-6. **Bayesian Networks (Probabilistic)**: Student network with probabilistic inference
+6. **Kernel Machines/SVM (Hybrid)**: RBF kernel classification on XOR data
 
-7. **Hidden Markov Models (Probabilistic)**: Forward algorithm for sequence modeling
+7. **Bayesian Networks (Probabilistic)**: Student network with probabilistic inference
+
+8. **Hidden Markov Models (Probabilistic)**: Forward algorithm for sequence modeling
+
+**Note:** The paper mentions 5 key categories (logic programming, transformers, formal reasoning, kernel machines, and graphical models). This demo provides 8 concrete examples that implement these paradigms, with multiple examples for some categories (e.g., neural networks and graphical models) to demonstrate different aspects of Tensor Logic.
 
 ### Core Tensor Logic Engine
 
@@ -107,7 +120,9 @@ The engine implements Einstein summation (`einsum`) which is the fundamental ope
 ## References
 
 - Domingos, P. (2025). *Tensor Logic: The Language of AI*. [arXiv:2510.12269](https://arxiv.org/abs/2510.12269)
-- [Tensor Logic website](https://tensor-logic.org)
+- website: [Tensor Logic website](https://tensor-logic.org)
+- Scarfe, T., & Duggar, K. (2025). *Tensor Logic "Unifies" AI Paradigms - Pedro Domingos*. [Machine Learning Street Talk YouTube](https://youtu.be/4APMGvicmxY?si=T0ic6RgZ-epTPBMt&t=1070)
+- website: [Machine Learning Street Talk (MLST)](https://www.mlst.ai/about)
 
 ## TO DO
 

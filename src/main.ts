@@ -10,6 +10,7 @@
 import {
   runLogicProgramExample,
   runMLPExample,
+  runFullXORDemo,
   runTransformerExample,
   runMultiHeadAttentionExample,
   runKernelExample,
@@ -45,6 +46,12 @@ const examples: Example[] = [
     name: 'Multi-Layer Perceptron',
     category: 'neural',
     run: runMLPExample,
+  },
+  {
+    id: 'mlp-batch',
+    name: 'MLP Batch Processing (XOR)',
+    category: 'neural',
+    run: runFullXORDemo,
   },
   {
     id: 'transformer',
