@@ -4,10 +4,13 @@ From: Domingos, P. (2025). *Tensor Logic: The Language of AI*. [arXiv:2510.12269
 
 <!-- TOC -->
 
-- [Notes](#notes)
-- [Notes](#notes)
-- [Notes](#notes)
-  - [Bayesian Network Example](#bayesian-network-example)
+- [Graph Neural Networks in Tensor Logic (Table 1)](#graph-neural-networks-in-tensor-logic-table-1)
+  - [Notes](#notes)
+- [Transformers in Tensor Logic (Table 2)](#transformers-in-tensor-logic-table-2)
+  - [Notes](#notes)
+- [Components of Graphical Models in Tensor Logic (Table 3)](#components-of-graphical-models-in-tensor-logic-table-3)
+  - [Notes](#notes)
+    - [Bayesian Network Example](#bayesian-network-example)
 
 <!-- /TOC -->
 
