@@ -3,6 +3,7 @@
 <!-- TOC -->
 
 - [Getting Started](#getting-started)
+  - [Have a Look Around in the Documents](#have-a-look-around-in-the-documents)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Development](#development)
@@ -26,6 +27,19 @@
 This document contains development setup instructions and project structure information for the Tensor Logic educational demo.
 
 ## Getting Started
+
+### Have a Look Around in the Documents
+
+Before diving into development, take a moment to explore the comprehensive documentation available in the [`docs/`](./docs/) folder. The [`docs/README.md`](./docs/README.md) file provides a complete guide to all documentation, research materials, and development notes, including:
+
+- The original Tensor Logic research paper
+- Development prompts and project history
+- Performance optimization analysis
+- CI/CD setup guides
+- Security audit documentation
+- And much more
+
+This documentation index will help you understand the project's theoretical foundation, development process, and available resources.
 
 ### Prerequisites
 

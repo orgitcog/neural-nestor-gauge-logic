@@ -137,6 +137,8 @@ The engine implements Einstein summation (`einsum`) which is the fundamental ope
 
 For development setup, installation instructions, and project structure, see the [Development Guide](README_dev.md).
 
+But first, have a look around with an [overview](docs/README.md) of documentation for the entire project in the docs folder.
+
 ## License
 
 MIT

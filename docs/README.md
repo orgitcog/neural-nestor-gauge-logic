@@ -3,14 +3,15 @@
 <!-- TOC -->
 
 - [Quick Navigation](#quick-navigation)
-- [Files](#files)
-  - [2510.12269v3.pdf](#251012269v3pdf)
+- [Documents](#documents)
+  - [Dr. Domingos' Paper on Tensor Logic](#dr-domingos-paper-on-tensor-logic)
+  - [Assessment.md](#assessmentmd)
   - [Prompts.md](#promptsmd)
   - [Performance-Options.md](#performance-optionsmd)
   - [CI_CD.md](#ci_cdmd)
   - [SECURITY_AUDIT.md](#security_auditmd)
   - [Versions.md](#versionsmd)
-- [Related Documentation](#related-documentation)
+- [Related Documentation (Node README.md Files)](#related-documentation-node-readmemd-files)
 
 <!-- /TOC -->
 This directory contains documentation, research materials, and development notes for the Tensor Logic educational demo project.
@@ -18,6 +19,7 @@ This directory contains documentation, research materials, and development notes
 ## Quick Navigation
 
 - **Need the theoretical foundation?** → Read [2510.12269v3.pdf](./2510.12269v3.pdf)
+- **Want to understand the development experience?** → See [Assessment.md](./Assessment.md)
 - **Understanding the project origin?** → See [Prompts.md](./Prompts.md)
 - **Want to optimize performance?** → Start with [Performance-Options.md](./Performance-Options.md)
 - **Setting up CI/CD or deploying?** → See [CI_CD.md](./CI_CD.md)
@@ -26,9 +28,11 @@ This directory contains documentation, research materials, and development notes
 
 ---
 
-## Files
+## Documents
 
-### 2510.12269v3.pdf
+### Dr. Domingos' Paper on Tensor Logic
+
+**2510.12269v3.pdf**
 
 **Tensor Logic: The Language of AI** (299KB, 2,407 lines)
 
@@ -47,6 +51,30 @@ The original research paper by Prof. Emeritus Pedro Domingos (University of Wash
 - Website: [tensor-logic.org](https://tensor-logic.org)
 
 This paper is the primary source material for understanding Tensor Logic theory and implementation.
+
+---
+
+### Assessment.md
+
+**Development experience and retrospective** (8.5KB, 69 lines)
+
+See: [`Assessment.md`](./Assessment.md)
+
+A retrospective assessment of the development process using Cursor IDE to build the Tensor Logic educational demo. This document provides:
+
+- **Background and Motivation**: The developer's journey into Tensor Logic and motivation for learning ML
+- **Development Experience**: What worked well and what was challenging when using Cursor
+- **Challenges Encountered**: Difficulties with notation, formula accuracy, and infrastructure setup
+- **Lessons Learned**: Insights about using AI coding assistants for educational projects
+- **Looking Forward**: Suggestions for future improvements and tooling
+
+**Key Topics:**
+- Experience with Cursor IDE (Opus 4.5 vs Auto mode)
+- Challenges with Tensor Logic notation and formula accuracy
+- Infrastructure vs content development time allocation
+- Recommendations for Tensor Logic tooling (MCP servers, LSP support)
+
+Useful for understanding the human side of the development process and the practical realities of building this project.
 
 ---
 
@@ -168,9 +196,10 @@ Useful for reproducing the development environment or troubleshooting setup issu
 
 ---
 
-## Related Documentation
+## Related Documentation (Node README.md Files)
 
 - **Main project README**: [`../README.md`](../README.md) - User-facing project overview
 - **Development Guide**: [`../README_dev.md`](../README_dev.md) - Developer setup and project structure
+- **Testing Documentation**: [`../scripts/README-test-scroll.md`](../scripts/README-test-scroll.md) - Scroll behavior testing with Puppeteer
 - **Fonts Documentation**: [`../src/fonts/README.md`](../src/fonts/README.md) - Self-hosted fonts setup
 
