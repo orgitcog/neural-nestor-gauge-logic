@@ -10,7 +10,7 @@ Based on the paper: [Tensor Logic: The Language of AI](https://arxiv.org/abs/251
 
 And inspired by Dr. Tim Scarfe's 2-minute demo (with co-host Dr. Keith Duggar) on the interview of Prof. Domingos in Machine Learning Street Talk's YouTube channel: [Tensor Logic "Unifies" AI Paradigms - Pedro Domingos](https://youtu.be/4APMGvicmxY?si=T0ic6RgZ-epTPBMt&t=1070)
 
-![Tensor Logic Demo Screenshot](Screen%20Shot%202025-12-16%20at%2019.48.31.png)
+![Tensor Logic Demo Screenshot](docs/Screen-Shot_2025-12-17_19.43.31.png)
 
 <!-- TOC -->
 
