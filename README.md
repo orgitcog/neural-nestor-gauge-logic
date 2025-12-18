@@ -26,6 +26,7 @@ And inspired by Dr. Tim Scarfe's 2-minute demo (with co-host Dr. Keith Duggar) o
 - [Why Does This Matter?](#why-does-this-matter)
 - [References](#references)
 - [TO DO](#to-do)
+- [Assessment](#assessment)
 - [Getting Started for Development](#getting-started-for-development)
 - [License](#license)
 
@@ -127,6 +128,10 @@ The engine implements Einstein summation (`einsum`) which is the fundamental ope
 ## TO DO
 
 - [ ] Validate these models against known ML examples from reputable sources (e.g., textbook examples, benchmark datasets, reference implementations)
+
+## Assessment
+
+- See [docs/Assessment.md](docs/Assessment.md)
 
 ## Getting Started for Development
 
