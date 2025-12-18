@@ -37,7 +37,6 @@ interface TestResult {
 }
 
 const HEADER_HEIGHT = 140;
-const TOLERANCE = 10; // pixels
 
 async function startDevServer(port: number): Promise<{ process: any; url: string }> {
   return new Promise((resolve, reject) => {
@@ -52,7 +51,7 @@ async function startDevServer(port: number): Promise<{ process: any; url: string
       output += data.toString();
       if (output.includes('Local:') || output.includes('localhost')) {
         const match = output.match(/Local:\s*(https?:\/\/[^\s]+)/);
-        const url = match ? match[1] : `http://localhost:${port}`;
+        const url = match?.[1] ?? `http://localhost:${port}`;
         resolve({ process: vite, url });
       }
     });
@@ -71,7 +70,7 @@ async function startDevServer(port: number): Promise<{ process: any; url: string
   });
 }
 
-async function waitForTransition(page: Page, timeout = 500): Promise<void> {
+async function waitForTransition(_page: Page, timeout = 500): Promise<void> {
   // Simply wait for the transition duration + buffer
   // CSS transition is 250ms, so we wait a bit longer to ensure completion
   await new Promise(resolve => setTimeout(resolve, timeout));
@@ -81,14 +80,6 @@ async function testStepScroll(
   page: Page,
   stepIndex: number
 ): Promise<TestResult> {
-  // Get step name
-  const stepName = await page.evaluate((index) => {
-    const step = document.querySelector(`.step[data-step="${index}"]`);
-    if (!step) return 'Unknown';
-    const header = step.querySelector('h3');
-    return header ? header.textContent || 'Unknown' : 'Unknown';
-  }, stepIndex);
-
   // Click the next/previous button to navigate to this step
   // Note: UI displays 1-based step numbers (1, 2, 3...), but stepIndex is 0-based (0, 1, 2...)
   const currentStep = await page.evaluate(() => {
@@ -257,15 +248,24 @@ async function main() {
   // Parse command line arguments
   for (const arg of args) {
     if (arg.startsWith('--example=')) {
-      options.example = arg.split('=')[1];
+      const exampleValue = arg.split('=')[1];
+      if (exampleValue) {
+        options.example = exampleValue;
+      }
     } else if (arg.startsWith('--step=')) {
-      options.step = parseInt(arg.split('=')[1]);
+      const stepValue = arg.split('=')[1];
+      if (stepValue) {
+        options.step = parseInt(stepValue, 10);
+      }
     } else if (arg === '--all-steps') {
       options.allSteps = true;
     } else if (arg === '--headed') {
       options.headless = false;
     } else if (arg.startsWith('--port=')) {
-      options.port = parseInt(arg.split('=')[1]);
+      const portValue = arg.split('=')[1];
+      if (portValue) {
+        options.port = parseInt(portValue, 10);
+      }
     }
   }
 
@@ -320,7 +320,7 @@ async function main() {
     console.log('✅ Browser launched (headless)');
 
     // Run tests
-    const results = await runTests(browser, devServer.url, options);
+    const results = await runTests(browser, devServer.url ?? '', options);
 
     // Print summary
     console.log('\n' + '='.repeat(60));
