@@ -149,19 +149,29 @@ export function extractSlice(
     stride *= tensor.shape[i];
   }
 
+  // Calculate strides for the result tensor (without the sliced dimension)
+  const resultStrides: number[] = [];
+  stride = 1;
+  for (let i = newShape.length - 1; i >= 0; i--) {
+    resultStrides[i] = stride;
+    stride *= newShape[i];
+  }
+
   // Iterate over all positions in the result tensor
   const resultSize = newShape.reduce((a, b) => a * b, 1);
   
   for (let resultIdx = 0; resultIdx < resultSize; resultIdx++) {
     // Convert result index to multi-dimensional coordinates
-    const coords: number[] = [];
+    // Working backwards: for shape [a, b, c], idx -> [i, j, k] where:
+    // k = idx % c
+    // j = (idx / c) % b
+    // i = (idx / (c * b)) % a
+    const coords: number[] = new Array(newShape.length);
     let temp = resultIdx;
     
-    // Build coordinates for result tensor
     for (let i = newShape.length - 1; i >= 0; i--) {
-      const resultStride = newShape.slice(i + 1).reduce((a, b) => a * b, 1);
-      coords[i] = Math.floor(temp / resultStride);
-      temp = temp % resultStride;
+      coords[i] = temp % newShape[i];
+      temp = Math.floor(temp / newShape[i]);
     }
     
     // Map to original tensor coordinates (insert sliceIndex at dimIndex)
