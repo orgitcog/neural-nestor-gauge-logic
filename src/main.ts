@@ -183,11 +183,8 @@ function renderExample(example: Example): void {
   // Add interactive functionality
   setupStepInteractivity(totalSteps);
   
-  // Scroll to the top of the example container so user sees the title and overview
-  const exampleContainer = mainContent.querySelector('.example-container');
-  if (exampleContainer) {
-    exampleContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  // Note: Step 0 scrolling is handled by updateStepNavigation() in setupStepInteractivity
+  // No need to scroll the example container separately
 }
 
 let currentStepIndex = 0;
@@ -250,6 +247,7 @@ function setupStepInteractivity(totalSteps: number): void {
         const mainContent = document.getElementById('main-content');
         if (mainContent) {
           const stepElement = step;
+          const activeStepIndex = stepIndex; // Capture for use in closure
           
           // Function to calculate and perform scroll
           const performScroll = () => {
@@ -262,27 +260,39 @@ function setupStepInteractivity(totalSteps: number): void {
               return;
             }
             
-            // Get current positions after all layout changes
-            const stepRect = stepElement.getBoundingClientRect();
-            const mainContentRect = mainContent.getBoundingClientRect();
-            
-            // Calculate scroll position: step's viewport-relative position converted to scroll coordinates
-            // stepRect.top is relative to viewport, mainContentRect.top is relative to viewport
-            // mainContent.scrollTop is the current scroll position
-            // We want: step's top edge at headerHeight from viewport top
-            const targetScroll = Math.max(0, mainContent.scrollTop + stepRect.top - mainContentRect.top - headerHeight);
-            
-            mainContent.scrollTo({
-              top: targetScroll,
-              behavior: 'smooth'
+            // Use requestAnimationFrame to ensure layout is fully settled
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                // Get current positions after all layout changes
+                const stepRect = stepElement.getBoundingClientRect();
+                const mainContentRect = mainContent.getBoundingClientRect();
+                
+                // Calculate scroll position: step's viewport-relative position converted to scroll coordinates
+                // stepRect.top is relative to viewport, mainContentRect.top is relative to viewport
+                // mainContent.scrollTop is the current scroll position
+                // We want: step's top edge at headerHeight from viewport top
+                const currentScrollTop = mainContent.scrollTop;
+                const stepTopRelativeToMain = stepRect.top - mainContentRect.top;
+                const targetScroll = Math.max(0, currentScrollTop + stepTopRelativeToMain - headerHeight);
+                
+                // Always position step's top edge at headerHeight
+                // This ensures the beginning of the step content is visible
+                mainContent.scrollTo({
+                  top: targetScroll,
+                  behavior: 'smooth'
+                });
+              });
             });
           };
           
           // Always scroll, even if already on the step (to ensure correct position)
           // Wait for all step transitions to complete (250ms transition + buffer for all steps)
           // We need to wait for both the expanding step AND any collapsing steps
+          // On initial load, wait a bit longer to ensure layout is fully settled, especially for Step 0
           const transitionDuration = 250; // From CSS --transition-normal
-          const waitTime = transitionDuration + 150; // Extra buffer for multiple steps
+          const isInitialLoad = mainContent.scrollTop === 0 && activeStepIndex === 0;
+          // For Step 0 on initial load, wait longer to ensure tall content is fully rendered
+          const waitTime = isInitialLoad ? transitionDuration + 400 : transitionDuration + 150;
           
           setTimeout(performScroll, waitTime);
         }

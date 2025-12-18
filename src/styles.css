@@ -732,6 +732,11 @@ a:hover {
   padding: var(--space-lg);
 }
 
+/* Step 0 (Overview) only has explanation, no tensor output - use single column */
+.step[data-step="0"] .step-content {
+  grid-template-columns: 1fr;
+}
+
 .step-explanation pre {
   font-family: var(--font-body);
   font-size: 0.95rem;

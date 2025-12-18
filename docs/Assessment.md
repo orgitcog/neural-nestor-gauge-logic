@@ -49,7 +49,8 @@ So to fix this I sat down and gave Prof. Domingos' paper a good, old-fashioned r
 - Of course, further verification work still needs to be done to be sure they're right!
 
 ### What's Good
-The fold-out UI in each of the examples in the web app is nice because you can separately conceal or reveal each step of the computation separately. As a program, Tensor Logic allows for concise, elegant psuedo-code in the examples. The fold-out UI works quite smoothly showing you the details, once step at a time, if you use the Next and Previous navigation buttons provided in each of the examples. The UI is still not as slick as I would like it.
+The fold-out UI in each of the examples in the web app is nice because you can separately conceal or reveal each step of the computation separately. As a program, Tensor Logic allows for concise, elegant psuedo-code in the examples. The fold-out UI works quite smoothly showing you the details, once step at a time, if you use the Next and Previous navigation buttons provided in each of the examples. However, if are several steps to examples, you'll need scroll the view window to see the next step.
+- I created a test to allow the chatbot iteratively try fixes and test them, however, "I just got: Failed to run review: insufficient funds." So I am taking this as a omen to stop.
 
 ### What's Really Good
 
