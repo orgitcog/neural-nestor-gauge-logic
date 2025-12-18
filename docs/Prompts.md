@@ -259,8 +259,8 @@ The prompt above resulted in:
 > Fix the following Cursor workflow issues:
 >
 > **Markdown File Opening Problem:**
-> - A markdown file (`docs/prompts.md`) cannot be opened in Cursor, showing error: "The editor could not be opened due to an unexpected error"
-> - The backup file (`docs/prompts.md.backup`) opens fine, suggesting the issue is related to markdown preview/rendering mode
+> - A markdown file (`docs/Prompts.md`) cannot be opened in Cursor, showing error: "The editor could not be opened due to an unexpected error"
+> - The backup file (`docs/Prompts.md.backup`) opens fine, suggesting the issue is related to markdown preview/rendering mode
 > - I want markdown files to open in preview mode automatically, but this specific file crashes when trying to open in preview
 > - Fix the file so it can open in preview mode, or configure workspace settings appropriately
 >
