@@ -430,6 +430,39 @@ export function tensorToString(tensor: Tensor, precision = 3): string {
     return `[\n${lines.join(',\n')}\n]`;
   }
 
+  // Handle 3D tensors: show as slices
+  if (tensor.shape.length === 3) {
+    const [dim0, dim1, dim2] = tensor.shape;
+    const slices: string[] = [];
+    for (let i = 0; i < dim0; i++) {
+      const slice: string[] = [];
+      for (let j = 0; j < dim1; j++) {
+        const row: string[] = [];
+        for (let k = 0; k < dim2; k++) {
+          const idx = i * (dim1 * dim2) + j * dim2 + k;
+          row.push(tensor.data[idx].toFixed(precision));
+        }
+        slice.push(`    [${row.join(', ')}]`);
+      }
+      slices.push(`  ${tensor.indices[0]}=${i}:\n${slice.join(',\n')}`);
+    }
+    return `[\n${slices.join('\n\n')}\n]`;
+  }
+
+  // For 4D and higher, show a summary with some sample values
+  if (tensor.shape.length >= 4) {
+    const totalSize = tensor.shape.reduce((a, b) => a * b, 1);
+    const sampleSize = Math.min(20, totalSize);
+    const sampleValues: string[] = [];
+    for (let i = 0; i < sampleSize; i++) {
+      sampleValues.push(tensor.data[i].toFixed(precision));
+    }
+    const remaining = totalSize - sampleSize;
+    return `Tensor(shape=[${tensor.shape.join(', ')}], indices=[${tensor.indices.join(', ')}])\n` +
+           `First ${sampleSize} values: [${sampleValues.join(', ')}]${remaining > 0 ? ` ... (${remaining} more)` : ''}`;
+  }
+
+  // Fallback for any other case
   return `Tensor(shape=[${tensor.shape.join(', ')}], indices=[${tensor.indices.join(', ')}])`;
 }
 

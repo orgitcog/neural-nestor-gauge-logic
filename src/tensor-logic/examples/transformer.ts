@@ -342,30 +342,37 @@ many such layers (GPT-3 has 96, GPT-4 likely more).`,
   });
 
   return {
-    title: 'Transformer: Self-Attention Mechanism',
+    title: 'Transformers in Tensor Logic',
     description: `The Transformer architecture, basis of modern LLMs (GPT, BERT, etc.).
 
-The key insight: Attention is Einstein summation!
+From Table 2 in the paper, the Transformer components are:
 
-Self-Attention in Tensor Logic:
-  Query[q,d] = Input[q,e] · Wq[e,d]
-  Key[k,d] = Input[k,e] · Wk[e,d]  
-  Value[v,d] = Input[v,e] · Wv[e,d]
-  
-  Scores[q,k] = Query[q,d] · Key[k,d] / √d
-  Weights[q,k] = softmax(Scores)[q,k]
-  Output[q,d] = Weights[q,k] · Value[k,d]
+Input: X(p, t) - relation stating that position p contains token t
+Embedding: EmbX[p, d] = X(p, t) Emb[t, d]
+Residual stream: Stream[0, p, d] = EmbX[p, d] + PosEnc[p, d]
+Attention: Query[b, h, p, dk] = WQ[b, h, dk, d] Stream[b, p, d]
+          Comp[b, h, p, p′] = softmax(Query[b, h, p, dk] Key[b, h, p′, dk]/sqrt(Dk))
+          Attn[b, h, p, dv] = Comp[b, h, p, p′] Val[b, h, p′, dv]
+Merge: Merge[b, p, dm] = concat(Attn[b, h, p, dv])
+Output: Y[p, t] = softmax(WO[t, d] Stream[B, p, d])
 
-This is analogous to logical inference:
-- Query: "What am I looking for?" (the query in a logical rule)
-- Key: "What do I match?" (facts that might unify with the query)
-- Value: "What do I contribute?" (information from matching facts)
+Where:
+- b is the attention block index
+- h is the attention head index
+- p is the position index
+- d, dk, dv, dm are dimension indices
 
-The difference: Transformers use SOFT matching (dot product + softmax)
-instead of Boolean unification, enabling gradient-based learning.`,
-    code: `// Self-attention computes:
-Attention[q,k] = softmax(Query[q,d] · Key[k,d] / √d)
-Output[q,d'] = Attention[q,k] · Value[k,d']`,
+The key insight: Attention is Einstein summation! This is analogous to
+logical inference but with soft matching (dot product + softmax) instead
+of Boolean unification, enabling gradient-based learning.`,
+    code: `// Transformer (from paper Table 2):
+X(p, t)  // Input relation
+EmbX[p, d] = X(p, t) Emb[t, d]  // Embedding
+Stream[0, p, d] = EmbX[p, d] + PosEnc[p, d]  // Residual stream
+Query[b, h, p, dk] = WQ[b, h, dk, d] Stream[b, p, d]  // Attention
+Comp[b, h, p, p′] = softmax(Query[b, h, p, dk] Key[b, h, p′, dk]/sqrt(Dk))
+Attn[b, h, p, dv] = Comp[b, h, p, p′] Val[b, h, p′, dv]
+Y[p, t] = softmax(WO[t, d] Stream[B, p, d])  // Output`,
     steps,
   };
 }

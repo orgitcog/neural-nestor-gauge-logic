@@ -194,11 +194,20 @@ the rules and base facts through logical inference.`,
     title: 'Logic Programming: Family Relationships',
     description: `This example shows how Datalog-style logic programming maps to tensor operations.
 
-The key insight is that a logical rule like:
-  Ancestor(x,z) ← Ancestor(x,y), Parent(y,z)
+From the paper, a Datalog rule is equivalent to a tensor equation using einsum:
 
-Is equivalent to matrix multiplication:
-  Ancestor = Ancestor · Parent
+Datalog rule:
+  Ancestor(x, z) ← Ancestor(x, y), Parent(y, z)
+
+Tensor Logic equation:
+  Ancestor[x, z] = Ancestor[x, y] Parent[y, z]
+
+This equation:
+1. Joins Ancestor[x, y] and Parent[y, z] on the common index y
+2. Sums over y (implicit in einsum)
+3. Projects onto [x, z]
+
+In database terminology, this is a join followed by a projection.
 
 Where:
 - The comma (AND) becomes multiplication
@@ -207,11 +216,16 @@ Where:
 
 This is the Einstein summation "xy,yz->xz" - the same operation that
 underlies neural network layers, but operating on Boolean tensors.`,
-    code: `// Logical rule:
-Ancestor(x,z) ← Parent(x,y), Ancestor(y,z)
+    code: `// Datalog rule (from paper):
+Ancestor(x, z) ← Ancestor(x, y), Parent(y, z)
 
-// Equivalent tensor operation:
-Ancestor[x,z] = Σ_y Parent[x,y] · Ancestor[y,z]`,
+// Equivalent Tensor Logic equation:
+Ancestor[x, z] = Ancestor[x, y] Parent[y, z]
+
+// This equation:
+// 1. Joins Ancestor[x, y] and Parent[y, z] on the common index y
+// 2. Sums over y (implicit in einsum)
+// 3. Projects onto [x, z]`,
     steps,
   };
 }

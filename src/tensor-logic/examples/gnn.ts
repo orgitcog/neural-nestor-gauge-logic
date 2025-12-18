@@ -45,8 +45,10 @@ import {
   einsum,
   add,
   relu,
+  sigmoid,
   tensorToString,
 } from '../core';
+import { broadcastMultiply, extractSlice } from '../utils';
 
 export interface GNNResult {
   title: string;
@@ -80,9 +82,9 @@ export interface GNNResult {
 export function runGNNExample(): GNNResult {
   const steps: GNNResult['steps'] = [];
 
-  // Adjacency matrix: A[v,u] = 1 if there's an edge between v and u
-  // Undirected graph, so A is symmetric
-  const Adjacency = fromMatrix('Adjacency', ['v', 'u'], [
+  // Graph structure: Neig(x, y) is a relation (Boolean tensor)
+  // Neig[x,y] = 1 if there's an edge between nodes x and y
+  const Neig = fromMatrix('Neig', ['x', 'y'], [
     [0, 1, 0, 0], // Alice connected to Bob
     [1, 0, 1, 1], // Bob connected to Alice, Charlie, Diana
     [0, 1, 0, 0], // Charlie connected to Bob
@@ -90,10 +92,10 @@ export function runGNNExample(): GNNResult {
   ]);
 
   steps.push({
-    name: 'Graph Structure (Adjacency Matrix)',
-    explanation: `The adjacency matrix A[v,u] encodes the graph structure.
+    name: 'Graph Structure: Neig(x, y)',
+    explanation: `The graph structure is encoded as a relation Neig(x, y).
 
-A[v,u] = 1 means there's an edge from node v to node u.
+Neig[x,y] = 1 means there's an edge between nodes x and y.
 
 Our social network:
 - Node 0 (Alice) ↔ Node 1 (Bob)
@@ -102,18 +104,20 @@ Our social network:
 
 Bob is the central node, connected to everyone else.
 
-In Tensor Logic, the adjacency matrix acts as a "selector" in the
-Einstein summation - it determines which nodes contribute to each
-node's updated representation.`,
-    tensor: Adjacency,
-    tensorString: tensorToString(Adjacency, 0),
+In Tensor Logic notation from the paper:
+  Neig(x, y)  // Boolean relation defining graph structure
+
+This acts as a "selector" in Einstein summation - it determines
+which nodes contribute to each node's updated representation.`,
+    tensor: Neig,
+    tensorString: tensorToString(Neig, 0),
   });
 
-  // Initial node features: H[v,d] where v is node, d is feature dimension
-  // Let's use 3 features per node (e.g., interests, activity level, age group)
-  const NodeFeatures = createTensor(
-    'NodeFeatures',
-    ['v', 'd'],
+  // Initial node features: X[n, d] where n is node, d is feature dimension
+  // Initialization: Emb[n, 0, d] = X[n, d]
+  const X = createTensor(
+    'X',
+    ['n', 'd'],
     [4, 3],
     new Float64Array([
       // Alice: [interest_score, activity, age_group]
@@ -128,26 +132,57 @@ node's updated representation.`,
   );
 
   steps.push({
-    name: 'Initial Node Features',
-    explanation: `Each node has initial features H[v,d] representing its properties.
+    name: 'Initial Features: X[n, d]',
+    explanation: `Initial node features X[n, d] representing node properties.
 
 Node 0 (Alice): [0.8, 0.6, 0.3] - high interest, moderate activity
 Node 1 (Bob):   [0.9, 1.0, 0.5] - very active, central in network
 Node 2 (Charlie): [0.5, 0.3, 0.4] - lower activity
 Node 3 (Diana): [0.7, 0.5, 0.3] - similar to Alice
 
+In Tensor Logic notation from the paper:
+  Emb[n, 0, d] = X[n, d]  // Initialization
+
 These features will be updated by aggregating information from
 neighboring nodes through message passing.`,
-    tensor: NodeFeatures,
-    tensorString: tensorToString(NodeFeatures, 2),
+    tensor: X,
+    tensorString: tensorToString(X, 2),
   });
 
-  // Weight matrix: W[d,d'] transforms features from dimension d to d'
-  // For simplicity, we'll keep the same dimension (3 → 3)
-  const Weights = createTensor(
-    'Weights',
-    ['d', 'd_out'],
-    [3, 3],
+  // Initialize embeddings: Emb[n, 0, d] = X[n, d]
+  const Emb = createTensor(
+    'Emb',
+    ['n', 'l', 'd'],
+    [4, 1, 3],
+    new Float64Array([
+      // Layer 0 embeddings (initialized from X)
+      0.8, 0.6, 0.3, // Alice
+      0.9, 1.0, 0.5, // Bob
+      0.5, 0.3, 0.4, // Charlie
+      0.7, 0.5, 0.3, // Diana
+    ])
+  );
+
+  steps.push({
+    name: 'Initialization: Emb[n, 0, d] = X[n, d]',
+    explanation: `Initialize embeddings from node features.
+
+Tensor Logic (from paper):
+  Emb[n, 0, d] = X[n, d]
+
+This sets each node's 0th-layer embeddings to its features.
+The network will carry out L iterations of message passing,
+one per layer.`,
+    tensor: Emb,
+    tensorString: tensorToString(Emb, 2),
+  });
+
+  // MLP weights: WP[l, d′, d] transforms features
+  // For layer 0, we'll use a simple transformation
+  const WP = createTensor(
+    'WP',
+    ['l', 'd_prime', 'd'],
+    [1, 3, 3],
     new Float64Array([
       // Transform features: emphasize activity, blend interests
       0.5, 0.3, 0.2, // Output feature 0: blend of all inputs
@@ -157,127 +192,229 @@ neighboring nodes through message passing.`,
   );
 
   steps.push({
-    name: 'Weight Matrix',
-    explanation: `Learnable weight matrix W[d,d_out] transforms node features.
+    name: 'MLP: Z[n, l, d′] = relu(WP[l, d′, d] Emb[n, l, d])',
+    explanation: `MLP transformation of embeddings.
 
-This matrix learns how to combine and transform features during
-message passing. Each output dimension is a learned combination
-of input dimensions.
+Tensor Logic (from paper):
+  Z[n, l, d′] = relu(WP[l, d′, d] Emb[n, l, d])
+
+This applies a learned linear transformation followed by ReLU
+activation to each node's embedding at each layer.
 
 The weights shown here are example values - in practice, these
-would be learned through gradient descent on a task (e.g., node
-classification, link prediction).`,
-    tensor: Weights,
-    tensorString: tensorToString(Weights, 2),
+would be learned through gradient descent.`,
+    tensor: WP,
+    tensorString: tensorToString(WP, 2),
   });
 
-  // Message passing: H'[v,d'] = Σ_u A[v,u] · H[u,d] · W[d,d']
-  // Step 1: Aggregate neighbor features (without weights)
-  // Messages[v,d] = Σ_u A[v,u] · H[u,d]
-  const Messages = einsum('vu,ud->vd', Adjacency, NodeFeatures);
+  // Apply MLP to layer 0 embeddings
+  // Z[n, l, d′] = relu(WP[l, d′, d] Emb[n, l, d])
+  // Compute manually: for each n, l, d′, sum over d
+  const ZData = new Float64Array(4 * 1 * 3);
+  for (let n = 0; n < 4; n++) {
+    for (let l = 0; l < 1; l++) {
+      for (let d_prime = 0; d_prime < 3; d_prime++) {
+        let sum = 0;
+        for (let d = 0; d < 3; d++) {
+          // WP[l, d_prime, d]: shape [1, 3, 3], indices [l, d_prime, d]
+          const wpIdx = l * (3 * 3) + d_prime * 3 + d;
+          // Emb[n, l, d]: shape [4, 1, 3], indices [n, l, d]
+          const embIdx = n * (1 * 3) + l * 3 + d;
+          sum += WP.data[wpIdx] * Emb.data[embIdx];
+        }
+        // Z[n, l, d_prime]: shape [4, 1, 3]
+        const zIdx = n * (1 * 3) + l * 3 + d_prime;
+        ZData[zIdx] = Math.max(0, sum); // ReLU
+      }
+    }
+  }
+  const Z = createTensor('Z', ['n', 'l', 'd'], [4, 1, 3], ZData);
 
   steps.push({
-    name: 'Message Aggregation',
-    explanation: `First step: Aggregate features from neighbors.
+    name: 'Z[n, l, d′] after MLP',
+    explanation: `Transformed embeddings after MLP.
 
-Messages[v,d] = Σ_u A[v,u] · H[u,d]
+Z[n, l, d′] = relu(WP[l, d′, d] Emb[n, l, d])
 
-For each node v, sum the features of all its neighbors u.
+This prepares the embeddings for aggregation.`,
+    tensor: Z,
+    tensorString: tensorToString(Z, 2),
+  });
+
+  // Aggregation: Agg[n, l, d] = Neig(n, n′) Z[n′, l, d]
+  // Compute manually: for each n, l, d, sum over n′ where Neig[n, n′] = 1
+  const AggData = new Float64Array(4 * 1 * 3);
+  for (let n = 0; n < 4; n++) {
+    for (let l = 0; l < 1; l++) {
+      for (let d = 0; d < 3; d++) {
+        let sum = 0;
+        for (let n_prime = 0; n_prime < 4; n_prime++) {
+          // Neig[n, n_prime]: shape [4, 4], indices [x, y]
+          const neigIdx = n * 4 + n_prime;
+          if (Neig.data[neigIdx] > 0) {
+            // Z[n_prime, l, d]: shape [4, 1, 3]
+            const zIdx = n_prime * (1 * 3) + l * 3 + d;
+            sum += Z.data[zIdx];
+          }
+        }
+        const aggIdx = n * (1 * 3) + l * 3 + d;
+        AggData[aggIdx] = sum;
+      }
+    }
+  }
+  const Agg = createTensor('Agg', ['n', 'l', 'd'], [4, 1, 3], AggData);
+
+  steps.push({
+    name: 'Aggregation: Agg[n, l, d] = Neig(n, n′) Z[n′, l, d]',
+    explanation: `Aggregate features from neighbors.
+
+Tensor Logic (from paper):
+  Agg[n, l, d] = Neig(n, n′) Z[n′, l, d]
+
+For each node n, sum the transformed embeddings Z of all its neighbors n′.
+The relation Neig(n, n′) acts as a selector - only nodes with
+Neig[n, n′] = 1 contribute.
 
 Example for Node 1 (Bob):
 - Neighbors: Alice (0), Charlie (2), Diana (3)
-- Messages[1] = H[0] + H[2] + H[3]
-  = [0.8, 0.6, 0.3] + [0.5, 0.3, 0.4] + [0.7, 0.5, 0.3]
-  = [2.0, 1.4, 1.0]
+- Agg[1] = Z[0] + Z[2] + Z[3]
 
-This aggregates information from all connected nodes. The adjacency
-matrix A acts as a selector - only nodes with A[v,u] = 1 contribute.`,
-    tensor: Messages,
-    tensorString: tensorToString(Messages, 2),
+This aggregates information from all connected nodes.`,
+    tensor: Agg,
+    tensorString: tensorToString(Agg, 2),
   });
 
-  // Step 2: Transform aggregated messages
-  // H'[v,d'] = Messages[v,d] · W[d,d']
-  const UpdatedFeatures = einsum('vd,dd_out->vd_out', Messages, Weights);
+  // Update: Emb[n, l+1, d] = relu(WAgg Agg[n, l, d] + WSelf Emb[n, l, d])
+  // For simplicity, we'll use identity weights
+  const WAgg = createTensor('WAgg', ['d'], [3], new Float64Array([1, 1, 1]));
+  const WSelf = createTensor('WSelf', ['d'], [3], new Float64Array([0.5, 0.5, 0.5]));
+  
+  // Compute updated embeddings: element-wise multiply with broadcasting
+  // AggWeighted[n, l, d] = Agg[n, l, d] * WAgg[d]
+  const AggWeighted = broadcastMultiply(Agg, WAgg, 2);
+  AggWeighted.name = 'AggWeighted';
+  
+  // SelfWeighted[n, l, d] = Emb[n, l, d] * WSelf[d]
+  const SelfWeighted = broadcastMultiply(Emb, WSelf, 2);
+  SelfWeighted.name = 'SelfWeighted';
+  
+  const UpdatedFeatures = relu(add(AggWeighted, SelfWeighted));
+  UpdatedFeatures.name = 'UpdatedFeatures';
+  UpdatedFeatures.indices = ['n', 'l', 'd'];
 
   steps.push({
-    name: 'Feature Transformation',
-    explanation: `Second step: Transform aggregated messages through weights.
+    name: 'Update: Emb[n, l+1, d] = relu(WAgg Agg[n, l, d] + WSelf Emb[n, l, d])',
+    explanation: `Update embeddings by combining aggregated and self information.
 
-H'[v,d'] = Σ_d Messages[v,d] · W[d,d']
+Tensor Logic (from paper):
+  Emb[n, l+1, d] = relu(WAgg Agg[n, l, d] + WSelf Emb[n, l, d])
 
-Apply the weight matrix to transform the aggregated neighbor features.
+This combines:
+- Aggregated neighbor information (WAgg Agg)
+- Self information (WSelf Emb)
 
-This is standard matrix multiplication - the aggregated features
-are transformed to create new node representations.
+The residual connection (WSelf Emb) helps with gradient flow
+and allows nodes to retain their own features while incorporating
+neighbor information.
 
-For Bob (Node 1), who has the most neighbors, his representation
-will be most influenced by the network structure.`,
+This completes one layer of message passing. Multiple layers can
+be stacked to increase the receptive field.`,
     tensor: UpdatedFeatures,
     tensorString: tensorToString(UpdatedFeatures, 2),
   });
 
-  // Step 3: Apply activation (ReLU) and add residual connection
-  // H_final[v,d] = ReLU(H'[v,d]) + H[v,d]
-  const Activated = relu(UpdatedFeatures);
-  const FinalFeatures = add(Activated, NodeFeatures);
+  // Node classification: Y[n] = sig(WOut[d] Emb[n, L, d])
+  // Extract final layer embeddings
+  // UpdatedFeatures has shape [n, l, d] = [4, 1, 3] representing Emb[n, 1, d] (layer 1)
+  // In this single-layer example: layer 0 = initial, layer 1 = final (after one update)
+  // So L = 1, and we extract layer 1: EmbFinal[n, d] = UpdatedFeatures[n, 1, d]
+  // Extract slice at l=0 (which represents layer 1 in this single-layer example)
+  const EmbFinal = extractSlice(UpdatedFeatures, 1, 0);
+  EmbFinal.name = 'EmbFinal';
+  
+  steps.push({
+    name: 'Final Layer Embeddings: Emb[n, L, d]',
+    explanation: `Extract final layer embeddings for classification.
+
+Tensor Logic (from paper):
+  EmbFinal[n, d] = UpdatedFeatures[n, L, d]  // where L is the final layer
+
+For this single-layer example:
+- Layer 0: Initial embeddings Emb[n, 0, d] = X[n, d]
+- Layer 1: Final embeddings Emb[n, 1, d] (after one update)
+
+So L = 1. UpdatedFeatures has shape [4, 1, 3] representing Emb[n, 1, d].
+We extract these to get EmbFinal[n, d] for classification.`,
+    tensor: EmbFinal,
+    tensorString: tensorToString(EmbFinal, 2),
+  });
+  
+  const WOut = createTensor('WOut', ['d'], [3], new Float64Array([0.3, 0.5, 0.2]));
+  const PreOutput = einsum('nd,d->n', EmbFinal, WOut);
+  PreOutput.name = 'PreOutput';
+  
+  steps.push({
+    name: 'Pre-activation: WOut[d] Emb[n, L, d]',
+    explanation: `Compute weighted sum of embeddings.
+
+Tensor Logic (from paper):
+  PreOutput[n] = WOut[d] Emb[n, L, d]
+
+Einstein sum "nd,d->n" contracts over dimension d, producing
+a scalar score for each node n.`,
+    tensor: PreOutput,
+    tensorString: tensorToString(PreOutput, 3),
+  });
+  
+  const Y = sigmoid(PreOutput);
+  Y.name = 'Y';
 
   steps.push({
-    name: 'Activation and Residual Connection',
-    explanation: `Final step: Apply non-linearity and add residual connection.
+    name: 'Node Classification: Y[n] = sig(WOut[d] Emb[n, L, d])',
+    explanation: `Classify nodes using final layer embeddings.
 
-H_final[v,d] = ReLU(H'[v,d]) + H[v,d]
+Tensor Logic (from paper):
+  Y[n] = sig(WOut[d] Emb[n, L, d])
 
-1. ReLU introduces non-linearity (allows the model to learn complex patterns)
-2. Residual connection adds the original features (helps with gradient flow)
+This computes a classification score for each node by:
+1. Weighted sum of final layer embeddings (WOut[d] Emb[n, L, d])
+2. Apply sigmoid activation (sig) to get probability
 
-This is one layer of a GNN. Multiple layers can be stacked:
-- Layer 1: Nodes aggregate from direct neighbors
-- Layer 2: Nodes aggregate from 2-hop neighbors (neighbors of neighbors)
-- Layer k: Nodes aggregate from k-hop neighbors
-
-Each layer increases the "receptive field" - nodes can incorporate
-information from nodes further away in the graph.`,
-    tensor: FinalFeatures,
-    tensorString: tensorToString(FinalFeatures, 2),
+The sigmoid function sig() maps the output to [0, 1] for binary classification.`,
+    tensor: Y,
+    tensorString: tensorToString(Y, 3),
   });
 
   return {
-    title: 'Graph Neural Network: Message Passing',
-    description: `This example demonstrates how Graph Neural Networks map to Tensor Logic.
+    title: 'Graph Neural Networks in Tensor Logic',
+    description: `This example demonstrates Graph Neural Networks using the notation from the paper.
 
-A GNN layer performs message passing:
-1. Aggregate: Collect features from neighboring nodes
-2. Transform: Apply learned weights to transform features
-3. Update: Combine with original features (residual connection)
-
-The key operation is:
-  H'[v,d'] = Σ_u A[v,u] · H[u,d] · W[d,d']
+From Table 1 in the paper, a GNN layer performs:
+1. Initialization: Emb[n, 0, d] = X[n, d]
+2. MLP: Z[n, l, d′] = relu(WP[l, d′, d] Emb[n, l, d])
+3. Aggregation: Agg[n, l, d] = Neig(n, n′) Z[n′, l, d]
+4. Update: Emb[n, l+1, d] = relu(WAgg Agg[n, l, d] + WSelf Emb[n, l, d])
+5. Node classification: Y[n] = sig(WOut[d] Emb[n, L, d])
 
 Where:
-- A[v,u] is the adjacency matrix (graph structure)
-- H[u,d] are node features
-- W[d,d'] are learnable weights
+- Neig(x, y) is a relation (Boolean tensor) defining the graph structure
+- Emb[n, l, d] contains the d-dimensional embedding of each node n in each layer l
+- The network carries out L iterations of message passing, one per layer
+- WP, WAgg, WSelf, and WOut are learnable weight tensors
+- relu is the rectified linear unit activation function
+- sig is the sigmoid function
 
-This is exactly Einstein summation! The adjacency matrix acts as a
+This is exactly Einstein summation! The relation Neig(n, n′) acts as a
 "selector" - it determines which nodes contribute to each node's
 updated representation, just like a logical relation determines
-which facts contribute to a derived fact.
-
-GNNs are powerful for:
-- Node classification (predict node labels)
-- Link prediction (predict missing edges)
-- Graph classification (predict graph-level properties)
-- Recommendation systems (users and items form a bipartite graph)
-
-The same tensor operations work for any graph structure - social
-networks, molecular graphs, knowledge graphs, citation networks, etc.`,
-    code: `// Basic GNN layer:
-H'[v,d'] = Σ_u A[v,u] · H[u,d] · W[d,d']
-
-// Graph Attention Networks (GAT):
-Attention[v,u] = softmax(Query[v,d] · Key[u,d])
-H'[v,d'] = Σ_u Attention[v,u] · H[u,d] · W[d,d']`,
+which facts contribute to a derived fact.`,
+    code: `// Graph Neural Network (from paper Table 1):
+Neig(x, y)  // Graph structure
+Emb[n, 0, d] = X[n, d]  // Initialization
+Z[n, l, d′] = relu(WP[l, d′, d] Emb[n, l, d])  // MLP
+Agg[n, l, d] = Neig(n, n′) Z[n′, l, d]  // Aggregation
+Emb[n, l+1, d] = relu(WAgg Agg[n, l, d] + WSelf Emb[n, l, d])  // Update
+Y[n] = sig(WOut[d] Emb[n, L, d])  // Node classification`,
     steps,
   };
 }

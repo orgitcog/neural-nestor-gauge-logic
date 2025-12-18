@@ -261,10 +261,21 @@ The RBF kernel successfully classifies XOR!`,
   });
 
   return {
-    title: 'Kernel Machines: SVM-style Classification',
+    title: 'Kernel Machines in Tensor Logic',
     description: `Kernel methods map data to high-dimensional feature spaces
 where linear methods become powerful. The "kernel trick" lets us
 work with kernels k(x,x') directly, never computing the mapping.
+
+From the paper, kernel machines compute similarity between inputs:
+
+General form:
+  Y = Σ_i α[i] K(X, X_i)
+
+Polynomial kernel:
+  K[x, x′] = (Σ_i X[x, i] X[x′, i] + 1)^d
+
+Gaussian kernel (RBF):
+  K[x, x′] = exp(-γ Σ_i (X[x, i] - X[x′, i])²)
 
 The connection to Tensor Logic:
   Prediction[j] = Alpha[i] · Y[i] · Kernel[i,j]
@@ -280,12 +291,14 @@ Kernels can encode rich structure:
 - String kernels for text (count shared substrings)
 - Graph kernels for molecules (shared subgraphs)
 - Custom kernels for domain knowledge`,
-    code: `// Prediction: f(x) = Σ_i α_i · k(x_i, x)
-// In tensor logic: Output = Alpha[i] · Kernel[i,j] · Input[j]
+    code: `// Kernel Machines (from paper):
+Y = Σ_i α[i] K(X, X_i)
 
-// Common kernels:
-// Linear: k(x,x') = x·x'
-// RBF: k(x,x') = exp(-||x-x'||² / 2σ²)`,
+// Polynomial kernel:
+K[x, x′] = (Σ_i X[x, i] X[x′, i] + 1)^d
+
+// Gaussian kernel (RBF):
+K[x, x′] = exp(-γ Σ_i (X[x, i] - X[x′, i])²)`,
     steps,
   };
 }

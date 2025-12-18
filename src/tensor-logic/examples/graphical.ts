@@ -305,8 +305,16 @@ This is Bayesian inference - updating beliefs with evidence.`,
   });
 
   return {
-    title: 'Probabilistic Graphical Models: Bayesian Network',
+    title: 'Bayesian Network in Tensor Logic',
     description: `Graphical models represent joint distributions via factorization.
+
+From the paper, a Bayesian network can be encoded in tensor logic using
+one equation per variable:
+
+  PX[x] = CPTX[x, par1, ..., parn] P1[par1] ... Pn[parn]
+
+where CPTX[x, par1, ..., parn] is the conditional probability table for
+variable X given its parents, and P1[par1] ... Pn[parn] are the parent distributions.
 
 The core operations map directly to Tensor Logic:
 1. Factor product: P(A,B) = P(A)·P(B|A) is element-wise multiplication
@@ -323,7 +331,10 @@ Tensor Logic unifies:
 - Symbolic AI (Boolean tensors → SAT solving, theorem proving)
 - Probabilistic AI (Real tensors → graphical model inference)
 - Neural AI (Learned tensors → deep learning)`,
-    code: `// Joint probability distribution:
+    code: `// Bayesian Network (from paper):
+PX[x] = CPTX[x, par1, ..., parn] P1[par1] ... Pn[parn]
+
+// Joint probability distribution:
 P(A,B,C) = ψ_AB(A,B) · ψ_BC(B,C) / Z
 
 // Marginalization (sum out variables):

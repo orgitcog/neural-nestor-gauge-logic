@@ -40,6 +40,7 @@ import {
   sigmoid,
   tensorToString,
 } from '../core';
+import { broadcastAdd } from '../utils';
 
 export interface MLPResult {
   title: string;
@@ -226,12 +227,12 @@ Einstein sum:  "oh,h->o" sums over hidden dimension h
   const Output = sigmoid(preOutputWithBias);
 
   steps.push({
-    name: 'Final Output (after Sigmoid)',
-    explanation: `Sigmoid activation: σ(x) = 1/(1 + e^(-x))
+    name: 'Final Output (after sig)',
+    explanation: `Sigmoid activation: sig(x) = 1/(1 + e^(-x))
 
-Tensor Logic:  Output[o] = σ(PreOut[o])
+Tensor Logic (from paper):  Output[o] = sig(PreOut[o])
 
-  Output[0] = σ(1) ≈ 0.731
+  Output[0] = sig(1) ≈ 0.731
 
 This is interpreted as probability/confidence.
 Since 0.731 > 0.5, we classify XOR(1,0) = 1 ✓
@@ -257,8 +258,9 @@ The difference is:
 
 The smooth activations enable gradient-based learning, while the
 underlying tensor operations remain exactly the same.`,
-    code: `// Neural layer:
-Output[x] = activation(Σ_y Weight[x,y] · Input[y] + Bias[x])
+    code: `// Multilayer Perceptron (from paper):
+Z[l, d′] = relu(WP[l, d′, d] X[l, d])
+Y = sig(WOut[d] Z[L, d])
 
 // This is identical in structure to a logical rule:
 // Head[x] ← Body1[x,y] · Body2[y]`,
@@ -321,12 +323,8 @@ are processed in parallel using the same matrix operations.`,
   const preHidden = einsum('bi,hi->bh', Inputs, W1);
 
   // Broadcast add bias to each batch element
-  const preHiddenWithBias = createTensor('PreH+B', ['b', 'h'], [4, 2], new Float64Array(8));
-  for (let b = 0; b < 4; b++) {
-    for (let h = 0; h < 2; h++) {
-      preHiddenWithBias.data[b * 2 + h] = preHidden.data[b * 2 + h] + B1.data[h];
-    }
-  }
+  const preHiddenWithBias = broadcastAdd(preHidden, B1, 1);
+  preHiddenWithBias.name = 'PreH+B';
 
   steps.push({
     name: 'Hidden Pre-activations (Batch)',
@@ -382,7 +380,8 @@ All four XOR cases computed correctly!`,
     description: `Demonstrates batch processing - computing all XOR inputs simultaneously.
 The batch dimension is simply another tensor index that flows through unchanged.`,
     code: `// Batch MLP: same as single example, with batch dimension b:
-Output[b,x] = activation(Σ_y Weight[x,y] · Input[b,y] + Bias[x])`,
+Z[b, l, d′] = relu(WP[l, d′, d] X[b, l, d])
+Y[b] = sig(WOut[d] Z[b, L, d])`,
     steps,
   };
 }
