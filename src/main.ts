@@ -129,7 +129,7 @@ function renderExample(example: Example): void {
             <h2>Step-by-Step Execution</h2>
             <div class="step-controls">
               <button class="step-nav-btn" id="prev-step" disabled>← Previous</button>
-              <span class="step-counter">Step <span id="current-step">0</span> of ${totalSteps - 1}</span>
+              <span class="step-counter">Step <span id="current-step">0</span> of ${totalSteps}</span>
               <button class="step-nav-btn" id="next-step" ${totalSteps <= 1 ? 'disabled' : ''}>Next →</button>
             </div>
           </div>
@@ -265,20 +265,12 @@ function setupStepInteractivity(totalSteps: number): void {
             // Get current positions after all layout changes
             const stepRect = stepElement.getBoundingClientRect();
             const mainContentRect = mainContent.getBoundingClientRect();
-            const containerRect = stepsContainer.getBoundingClientRect();
             
-            // Calculate step's position relative to steps-container
-            const stepOffsetFromContainer = stepRect.top - containerRect.top;
-            
-            // Calculate container's position relative to main-content  
-            const containerOffsetFromMain = containerRect.top - mainContentRect.top;
-            
-            // Calculate absolute position in scroll container
-            const stepAbsoluteTop = mainContent.scrollTop + containerOffsetFromMain + stepOffsetFromContainer;
-            
-            // Target: step should be at headerHeight from viewport top
-            // The step's top edge should align with the top of the scrollable area (just below fixed header)
-            const targetScroll = Math.max(0, stepAbsoluteTop - headerHeight);
+            // Calculate scroll position: step's viewport-relative position converted to scroll coordinates
+            // stepRect.top is relative to viewport, mainContentRect.top is relative to viewport
+            // mainContent.scrollTop is the current scroll position
+            // We want: step's top edge at headerHeight from viewport top
+            const targetScroll = Math.max(0, mainContent.scrollTop + stepRect.top - mainContentRect.top - headerHeight);
             
             mainContent.scrollTo({
               top: targetScroll,

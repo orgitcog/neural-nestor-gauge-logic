@@ -7,7 +7,7 @@
 - [My Recent Background and Motivation for Tensor Logic](#my-recent-background-and-motivation-for-tensor-logic)
 - [What Happened with Cursor](#what-happened-with-cursor)
   - [What was Difficult](#what-was-difficult)
-  - [What's Still Could Really Wrong](#whats-still-could-really-wrong)
+  - [What's Was Really Wrong](#whats-was-really-wrong)
   - [What's Good](#whats-good)
 - [Looking Forward](#looking-forward)
 
@@ -38,7 +38,7 @@ It's important to clarify that this is a collection of **pre-computed examples**
 
 It was difficult to get Cursor to adopt even the notation of Tensor Logic given in the paper. It started out with tidy little Tensor Logic Code boxes but somehow they devolved into an almost alien-like, ASCII notation. (It used regexp's and I think my switch to self-hosted fonts for alleged security issues may have unduly constrained it.) And I'm not really certain that it got it quite right, though it seems to have come close. I wound up deleting the Tensor Logic Code boxes. 😨
 
-### What's Still Could Really Wrong
+### What's Was Really Wrong
 
 Most especially, instead of the formulas for examples in that paper, Opus used it's own knowledge of Tensors, einsums and general ML and created formulas for those examples  in its own way. This makes a simple comparison between the examples the the web app and what's in the paper exceedingly difficult for a novice in ML such as myself. I can't say that it's formulas are wrong, but I certainly can't tell straightforwardly if they're right with a simple comparison to Prof. Domingos' paper. 
 - I couldn't help but notice how quickly the initial examples were generated. As noted in the main [README.md](../README.md) file, more work is needed to validate (or invalidate) the examples by comparing those computations with other established software implementation of the specific ML examples. Again, LLMs can be our friend here. But not now as I'm out of time. 🤨
