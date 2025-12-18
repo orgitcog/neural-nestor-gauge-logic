@@ -400,7 +400,13 @@ function renderNav(): void {
  * Test function to verify scroll behavior
  * Call this from browser console: window.testStepScroll(stepIndex)
  */
-(window as any).testStepScroll = (stepIndex: number) => {
+declare global {
+  interface Window {
+    testStepScroll: (stepIndex: number) => void;
+  }
+}
+
+window.testStepScroll = (stepIndex: number) => {
   const mainContent = document.getElementById('main-content');
   if (!mainContent) {
     console.error('main-content not found');
