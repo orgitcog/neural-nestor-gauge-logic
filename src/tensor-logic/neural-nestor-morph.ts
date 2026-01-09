@@ -175,7 +175,9 @@ export function neuralNestorForward(
   if (nestor.weights && nestor.weights.size > 0) {
     const weight = nestor.weights.values().next().value;
     if (weight) {
-      output = einsum('...i,ij->...j', output, weight);
+      // Simple matrix multiplication: input @ weight
+      const notation = `${input.indices.join('')},${weight.indices.join('')}->${weight.indices[1]}`;
+      output = einsum(notation, output, weight);
     }
   }
   
@@ -377,16 +379,26 @@ export function gaugeTransformerAttention(
   const embeddings = nestors.map(n => n.tensor);
   
   // Apply projections to get Q, K, V
-  const queries = embeddings.map(e => einsum('i,ij->j', e, projections.query));
-  const keys = embeddings.map(e => einsum('i,ij->j', e, projections.key));
-  const values = embeddings.map(e => einsum('i,ij->j', e, projections.value));
+  const queries = embeddings.map(e => {
+    const notation = `${e.indices.join('')},${projections.query.indices.join('')}->${projections.query.indices[1]}`;
+    return einsum(notation, e, projections.query);
+  });
+  const keys = embeddings.map(e => {
+    const notation = `${e.indices.join('')},${projections.key.indices.join('')}->${projections.key.indices[1]}`;
+    return einsum(notation, e, projections.key);
+  });
+  const values = embeddings.map(e => {
+    const notation = `${e.indices.join('')},${projections.value.indices.join('')}->${projections.value.indices[1]}`;
+    return einsum(notation, e, projections.value);
+  });
   
   // Compute attention scores with gauge connection
   const attended = queries.map((q) => {
     // Compute attention scores for this query
     const scoreValues: number[] = [];
     for (const k of keys) {
-      const score = einsum('i,i->', q, k);
+      const notation = `${q.indices.join('')},${k.indices.join('')}->`;
+      const score = einsum(notation, q, k);
       // Extract the scalar value
       scoreValues.push(score.data[0]);
     }
@@ -413,7 +425,10 @@ export function gaugeTransformerAttention(
   });
   
   // Apply output projection
-  return attended.map(a => einsum('i,ij->j', a, transformer.outputProjection));
+  return attended.map(a => {
+    const notation = `${a.indices.join('')},${transformer.outputProjection.indices.join('')}->${transformer.outputProjection.indices[1]}`;
+    return einsum(notation, a, transformer.outputProjection);
+  });
 }
 
 /**
