@@ -174,7 +174,7 @@ export function neuralNestorForward(
   // Apply weights if present
   if (nestor.weights && nestor.weights.size > 0) {
     const weight = nestor.weights.values().next().value;
-    if (weight) {
+    if (weight && weight.indices.length >= 2) {
       // Simple matrix multiplication: input @ weight
       const notation = `${input.indices.join('')},${weight.indices.join('')}->${weight.indices[1]}`;
       output = einsum(notation, output, weight);
@@ -203,10 +203,9 @@ export function neuralNestorForward(
     // Aggregate child outputs (simple average)
     if (childOutputs.length > 0) {
       output = childOutputs.reduce((sum, t) => add(sum, t));
-      output = mapNestorTensors({ ...nestor, tensor: output }, t => 
-        createTensor(t.name, t.indices, t.shape, 
-          new Float64Array(t.data.map(v => v / childOutputs.length)))
-      ).tensor;
+      // Average by dividing each element
+      const avgData = new Float64Array(output.data.map(v => v / childOutputs.length));
+      output = { ...output, data: avgData };
     }
   }
   
@@ -261,8 +260,8 @@ export function embedNestorInForest(
       'zeros'
     );
     
-    // Copy fiber data into embedding (with dimension matching)
-    const minDim = Math.min(embeddingDim, nestor.fiber.fiberDim);
+    // Copy fiber data into embedding (with dimension matching and bounds checking)
+    const minDim = Math.min(embeddingDim, nestor.fiber.fiberDim, nestor.fiber.fiberData.data.length);
     for (let i = 0; i < minDim; i++) {
       fiberEmbedding.data[i] = nestor.fiber.fiberData.data[i];
     }
@@ -397,10 +396,11 @@ export function gaugeTransformerAttention(
     // Compute attention scores for this query
     const scoreValues: number[] = [];
     for (const k of keys) {
+      // Dot product: sum over all indices
       const notation = `${q.indices.join('')},${k.indices.join('')}->`;
       const score = einsum(notation, q, k);
-      // Extract the scalar value
-      scoreValues.push(score.data[0]);
+      // Extract the scalar value (einsum with empty output produces a scalar in data[0])
+      scoreValues.push(score.data[0] || 0);
     }
     
     // Apply softmax to get attention weights

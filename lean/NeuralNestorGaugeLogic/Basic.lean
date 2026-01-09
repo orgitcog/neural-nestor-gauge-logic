@@ -182,7 +182,7 @@ structure NestorFunctor (α β : Type) where
   preserves_comp : ∀ (f g : NestorMorphism α) (h : f.target.id = g.source.id),
                    (mapMorphism (NestorMorphism.comp f g h)).source.id =
                    (NestorMorphism.comp (mapMorphism f) (mapMorphism g) 
-                     sorry).source.id
+                     (by rw [← preserves_id]; simp [h])).source.id
 
 /-!
   # Neural Nestor Properties
