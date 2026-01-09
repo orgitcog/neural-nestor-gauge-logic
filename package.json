@@ -13,7 +13,9 @@
     "typecheck:scripts": "tsc -p tsconfig.scripts.json --noEmit",
     "test:scroll": "tsx scripts/test-scroll.ts",
     "test:scroll:all": "tsx scripts/test-scroll.ts --all-steps",
-    "test:nestor": "tsx scripts/test-neural-nestor.ts"
+    "test:nestor": "tsx scripts/test-neural-nestor.ts",
+    "test:validation": "tsx scripts/test-validation.ts",
+    "test": "tsx scripts/test-neural-nestor.ts && tsx scripts/test-validation.ts"
   },
   "dependencies": {
     "mathjs": "^13.2.0"

@@ -137,7 +137,12 @@ The engine implements Einstein summation (`einsum`) which is the fundamental ope
 
 ## TO DO
 
-- [ ] Validate these models against known ML examples from reputable sources (e.g., textbook examples, benchmark datasets, reference implementations)
+- [x] Validate core tensor operations against known ML examples (see `scripts/test-validation.ts`)
+  - Matrix multiplication, dot product, outer product validated against linear algebra references
+  - Activation functions (sigmoid, ReLU, softmax) validated against standard definitions
+  - Boolean transitive closure validated against Domingos paper example
+  - XOR MLP validated as classic neural network benchmark
+- [ ] Expand validation to cover all 9 interactive examples with external references
 
 ## Assessment
 

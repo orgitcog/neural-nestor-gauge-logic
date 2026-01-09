@@ -61,19 +61,39 @@ If `lake build` fails:
 
 ## TypeScript Tests
 
-For the TypeScript/Deno components:
-
 ```bash
-# Run neural nestor tests
-deno test scripts/test-neural-nestor.ts
+# Run all tests (nestor + validation)
+npm test
 
-# Run scroll tests
-deno test scripts/test-scroll.ts
+# Run neural nestor framework tests (10 tests)
+npm run test:nestor
+
+# Run validation tests against known benchmarks (10 tests)
+npm run test:validation
+
+# Run scroll/UI tests (requires Chrome/Puppeteer)
+npm run test:scroll
 ```
+
+### Validation Tests
+
+The validation test suite (`scripts/test-validation.ts`) validates implementations against:
+
+- **Linear algebra references**: Matrix multiplication, dot product, outer product
+- **Standard ML functions**: Sigmoid, ReLU, softmax activation functions
+- **Paper examples**: Boolean transitive closure from Domingos paper
+- **Classic benchmarks**: XOR with MLP (requires non-linearity)
+- **Batched operations**: Batch matrix multiplication
 
 ## Common Commands
 
 ```bash
 # Full verification (Lean + TypeScript)
-cd lean && lake build && cd .. && deno test scripts/test-neural-nestor.ts
+cd lean && lake build && cd .. && npm test
+
+# Type checking
+npm run typecheck
+
+# Linting
+npm run lint
 ```
