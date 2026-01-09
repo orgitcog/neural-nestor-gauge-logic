@@ -4,4 +4,5 @@ export { runTransformerExample, runMultiHeadAttentionExample } from './transform
 export { runKernelExample } from './kernel';
 export { runGraphicalModelExample, runHMMExample } from './graphical';
 export { runGNNExample } from './gnn';
+export { runNeuralNestorMorphExample } from './neural-nestor-morph';
 

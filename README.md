@@ -2,9 +2,19 @@
 
 # Tensor Logic Examples
 
+**Extended with Neural Nestor Gauge Logic Framework**
+
 </div>
 
 A collection of educational examples of **Pedro Domingos' Tensor Logic** — a programming paradigm that unifies neural and symbolic AI at a fundamental level. You can see them [here](https://tensor-logic.samkirk.com).
+
+**NEW**: This repository now includes the **Neural Nestor Gauge Logic** framework, which extends Tensor Logic with:
+- **Nestors**: Nested tensors forming rooted hypertrees with fiber bundle hypernodes
+- **Tensor Embeddings**: Shape fiber forest features of typed hyper-graph neural networks  
+- **Smooth Differential Gradients**: Categorical logic of a generalized gauge transformer
+- **Formal Verification**: Mathematical foundations verified with Lean 4
+
+See [Neural Nestor Gauge Logic Documentation](docs/Neural-Nestor-Gauge-Logic.md) for details.
 
 Based on the paper: [Tensor Logic: The Language of AI](https://arxiv.org/abs/2510.12269) by Prof. Emeritus Pedro Domingos (University of Washington)
 
