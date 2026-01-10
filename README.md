@@ -101,6 +101,22 @@ This framework unifies:
 - **Geometric** (rotation-equivariant)
 - **Compositional** (context-sensitive)
 
+### Generalized Graded Basis Systems
+
+**NEW**: Beyond Cayley-Dickson (binary-only), we now support **arbitrary radix systems** with multi-index structure:
+
+| System Type | Examples | Description |
+|-------------|----------|-------------|
+| **Trinary (p=3)** | Trionion (3D), Nonion (9D) | Layer pattern 1–1–1, 1–2–3–2–1 |
+| **Quinary (p=5)** | Pentonion (5D) | Layer pattern 1–1–1–1–1 |
+| **Mixed-Radix** | Hexenion (6D), Icosonion (20D) | ℤ₂×ℤ₃, ℤ₂²×ℤ₅ |
+
+These preserve the **multi-index structure** (not just layer coefficients) and support multiple multiplication rules (group algebra, twisted, matrix). See [Graded Basis Systems](docs/Graded-Basis-Systems.md) for details.
+
+```bash
+npm run test:graded-basis
+```
+
 ### Running Hypercomplex Examples
 
 ```bash
