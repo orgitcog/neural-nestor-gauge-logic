@@ -55,8 +55,12 @@ The key insight of Tensor Logic is that **logical rules and Einstein summation a
 The only difference is the atomic data type:
 - **Boolean (0/1)** → Symbolic logic
 - **Real numbers** → Neural networks
+- **Complex numbers (ℂ)** → Quantum-inspired AI
+- **Quaternions (ℍ)** → 3D spatial reasoning
+- **Octonions (𝕆)** → Non-associative reasoning
+- **Sedenions (𝕊) and beyond** → Over-parameterized systems
 
-This unification allows expressing both symbolic AI and neural networks in the same language.
+This unification allows expressing symbolic AI, neural networks, quantum computing, geometric deep learning, and compositional reasoning in the same language. See [Hypercomplex Extensions](docs/Hypercomplex-Extensions.md) for details.
 
 ## Demo Features
 

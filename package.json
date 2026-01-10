@@ -16,6 +16,7 @@
     "test:nestor": "tsx scripts/test-neural-nestor.ts",
     "test:validation": "tsx scripts/test-validation.ts",
     "test:unit": "tsx scripts/test-unit.ts",
+    "test:hypercomplex": "npx tsx scripts/test-hypercomplex.ts",
     "test": "tsx scripts/test-neural-nestor.ts && tsx scripts/test-validation.ts && tsx scripts/test-unit.ts"
   },
   "dependencies": {
