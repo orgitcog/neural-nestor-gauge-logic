@@ -15,7 +15,8 @@
     "test:scroll:all": "tsx scripts/test-scroll.ts --all-steps",
     "test:nestor": "tsx scripts/test-neural-nestor.ts",
     "test:validation": "tsx scripts/test-validation.ts",
-    "test": "tsx scripts/test-neural-nestor.ts && tsx scripts/test-validation.ts"
+    "test:unit": "tsx scripts/test-unit.ts",
+    "test": "tsx scripts/test-neural-nestor.ts && tsx scripts/test-validation.ts && tsx scripts/test-unit.ts"
   },
   "dependencies": {
     "mathjs": "^13.2.0"

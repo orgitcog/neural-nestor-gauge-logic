@@ -62,7 +62,7 @@ If `lake build` fails:
 ## TypeScript Tests
 
 ```bash
-# Run all tests (nestor + validation)
+# Run all tests (nestor + validation + unit)
 npm test
 
 # Run neural nestor framework tests (10 tests)
@@ -70,6 +70,9 @@ npm run test:nestor
 
 # Run validation tests against known benchmarks (10 tests)
 npm run test:validation
+
+# Run exhaustive unit tests for all modules (35 tests)
+npm run test:unit
 
 # Run scroll/UI tests (requires Chrome/Puppeteer)
 npm run test:scroll
