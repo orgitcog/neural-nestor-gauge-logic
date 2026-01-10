@@ -114,15 +114,14 @@ structure NestorMorphism (α : Type) where
 - ✅ Gauge connections specified
 - ✅ Category laws proven (identity, associativity)
 - ✅ Type safety verified
-- ⚠️  Some advanced proofs use `sorry` and need completion
+- ✅ All core proofs complete (no `sorry` placeholders)
 
 ## Future Work
 
-1. Complete all proofs (remove `sorry` placeholders)
-2. Add more sophisticated gauge transformation proofs
-3. Formalize neural network training properties
-4. Verify gradient computation correctness
-5. Add examples with concrete proofs
+1. Add more sophisticated gauge transformation proofs
+2. Formalize neural network training properties
+3. Verify gradient computation correctness
+4. Add examples with concrete proofs
 
 ## References
 

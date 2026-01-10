@@ -43,7 +43,6 @@ import {
   parallelTransport,
   composeMorphisms,
   identityMorphism,
-  mapNestorTensors,
 } from './nestor';
 
 /**
