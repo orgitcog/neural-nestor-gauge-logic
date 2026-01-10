@@ -9,9 +9,7 @@
  */
 
 import {
-  Complex,
   Quaternion,
-  Octonion,
   complex,
   quaternion,
   octonion,
@@ -23,8 +21,6 @@ import {
   createHypercomplexTensor,
   hypercomplexEinsum,
   complexReLU,
-  quaternionReLU,
-  splitActivation,
   extractRealParts,
   hypercomplexTensorToString,
 } from '../hypercomplex-tensor';

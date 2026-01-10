@@ -8,7 +8,6 @@
 import {
   createRadixSystem,
   createMixedRadixSystem,
-  createFromCatalog,
   formatLayerCoefficients,
   getBasisElementsAtGrade,
   multiIndexToString,
@@ -17,7 +16,6 @@ import {
   MultiplicationRule,
   GRADED_BASIS_CATALOG,
   type GradedBasis,
-  type RadixComponent,
 } from '../graded-basis.js';
 
 /**
