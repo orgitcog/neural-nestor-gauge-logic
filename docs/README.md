@@ -11,6 +11,9 @@
   - [CI_CD.md](#ci_cdmd)
   - [SECURITY_AUDIT.md](#security_auditmd)
   - [Versions.md](#versionsmd)
+  - [Neural-Nestor-Gauge-Logic.md](#neural-nestor-gauge-logicmd)
+  - [Hypercomplex-Extensions.md](#hypercomplex-extensionsmd)
+  - [HYPERCOMPLEX_SUMMARY.md](#hypercomplex_summarymd)
 - [Related Documentation (Node README.md Files)](#related-documentation-node-readmemd-files)
 
 <!-- /TOC -->
@@ -193,6 +196,79 @@ A preflight report documenting the development environment at project creation:
 - MCP servers configured
 
 Useful for reproducing the development environment or troubleshooting setup issues.
+
+---
+
+### Neural-Nestor-Gauge-Logic.md
+
+**Neural Nestor Gauge Logic Framework** (6.8KB, 230 lines)
+
+See: [`Neural-Nestor-Gauge-Logic.md`](./Neural-Nestor-Gauge-Logic.md)
+
+Documentation for the Neural Nestor Gauge Logic framework that extends Tensor Logic with:
+
+- **Nestors**: Nested tensors forming rooted hypertrees
+- **Fiber Bundles**: Vector spaces attached to each node
+- **Gauge Connections**: Parallel transport across edges
+- **Categorical Structure**: Morphisms, functors, and composition
+- **Formal Verification**: Mathematical foundations verified with Lean 4
+
+**Key Components:**
+- Hierarchical composition with Nestors
+- Smooth differential gradients through nested structures
+- Type system for hyper-graph neural networks
+- API reference and use cases
+
+---
+
+### Hypercomplex-Extensions.md
+
+**Hypercomplex Number Systems for Tensor Logic** (23KB, 321 lines)
+
+See: [`Hypercomplex-Extensions.md`](./Hypercomplex-Extensions.md)
+
+Theoretical framework extending Tensor Logic from Boolean/Real to hypercomplex number systems:
+
+- **The Fundamental Question**: What do complex/quaternion/octonion systems correspond to in AI?
+- **Cayley-Dickson Construction**: Building increasingly complex number systems
+- **Theoretical Correspondences**:
+  - Complex (ℂ) → Quantum-Inspired AI
+  - Quaternion (ℍ) → 3D Spatial Reasoning
+  - Octonion (𝕆) → Non-Associative Reasoning
+  - Sedenion (𝕊) → Over-Parameterized Systems
+  - Higher → Hyper-Dimensional Computing
+
+**Practical Applications:**
+- Quantum machine learning
+- Geometric deep learning
+- Physics-informed neural networks
+- Compositional semantics
+
+Includes implementation strategy and philosophical implications.
+
+---
+
+### HYPERCOMPLEX_SUMMARY.md
+
+**Implementation Summary for Hypercomplex Extensions** (7.1KB, 217 lines)
+
+See: [`HYPERCOMPLEX_SUMMARY.md`](./HYPERCOMPLEX_SUMMARY.md)
+
+Comprehensive summary of the hypercomplex extensions implementation:
+
+- **Problem Statement**: Extending Tensor Logic to hypercomplex number systems
+- **The Answer**: Mapping each hypercomplex algebra to an AI paradigm
+- **Implementation Details**:
+  - Hypercomplex number types (Complex, Quaternion, Octonion, Sedenion, CayleyDickson)
+  - Hypercomplex-valued tensors
+  - Generalized Einstein summation
+  - Activation functions
+  - 5 complete examples
+- **Theoretical Insights**: Algebraic structure vs. representational power trade-offs
+- **Test Results**: 67 tests, all passing
+- **Code Structure**: Overview of implementation files
+
+Essential reading for understanding what was implemented and why.
 
 ---
 

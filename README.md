@@ -8,13 +8,23 @@
 
 A collection of educational examples of **Pedro Domingos' Tensor Logic** — a programming paradigm that unifies neural and symbolic AI at a fundamental level. You can see them [here](https://tensor-logic.samkirk.com).
 
-**NEW**: This repository now includes the **Neural Nestor Gauge Logic** framework, which extends Tensor Logic with:
-- **Nestors**: Nested tensors forming rooted hypertrees with fiber bundle hypernodes
-- **Tensor Embeddings**: Shape fiber forest features of typed hyper-graph neural networks  
-- **Smooth Differential Gradients**: Categorical logic of a generalized gauge transformer
-- **Formal Verification**: Mathematical foundations verified with Lean 4
+**NEW**: This repository now includes:
 
-See [Neural Nestor Gauge Logic Documentation](docs/Neural-Nestor-Gauge-Logic.md) for details.
+1. **Neural Nestor Gauge Logic** framework - extends Tensor Logic with:
+   - **Nestors**: Nested tensors forming rooted hypertrees with fiber bundle hypernodes
+   - **Tensor Embeddings**: Shape fiber forest features of typed hyper-graph neural networks  
+   - **Smooth Differential Gradients**: Categorical logic of a generalized gauge transformer
+   - **Formal Verification**: Mathematical foundations verified with Lean 4
+   
+   See [Neural Nestor Gauge Logic Documentation](docs/Neural-Nestor-Gauge-Logic.md) for details.
+
+2. **Hypercomplex Extensions** - extends from Boolean/Real to Complex/Quaternion/Octonion and beyond:
+   - **Complex (ℂ)**: Quantum-inspired AI with phase and amplitude
+   - **Quaternion (ℍ)**: 3D spatial reasoning with rotation-equivariant networks
+   - **Octonion (𝕆)**: Non-associative logic for context-sensitive reasoning
+   - **Sedenion (𝕊) and higher**: Over-parameterized systems and hyper-dimensional computing
+   
+   See [Hypercomplex Extensions Documentation](docs/Hypercomplex-Extensions.md) for details.
 
 Based on the paper: [Tensor Logic: The Language of AI](https://arxiv.org/abs/2510.12269) by Prof. Emeritus Pedro Domingos (University of Washington)
 
@@ -25,6 +35,7 @@ And inspired by Dr. Tim Scarfe's 2-minute demo (with co-host Dr. Keith Duggar) o
 <!-- TOC -->
 
 - [The Core Insight](#the-core-insight)
+- [Hypercomplex Extensions](#hypercomplex-extensions)
 - [Demo Features](#demo-features)
   - [8 Interactive Examples](#8-interactive-examples)
   - [Core Tensor Logic Engine](#core-tensor-logic-engine)
@@ -55,8 +66,48 @@ The key insight of Tensor Logic is that **logical rules and Einstein summation a
 The only difference is the atomic data type:
 - **Boolean (0/1)** → Symbolic logic
 - **Real numbers** → Neural networks
+- **Complex numbers (ℂ)** → Quantum-inspired AI
+- **Quaternions (ℍ)** → 3D spatial reasoning
+- **Octonions (𝕆)** → Non-associative reasoning
+- **Sedenions (𝕊) and beyond** → Over-parameterized systems
 
-This unification allows expressing both symbolic AI and neural networks in the same language.
+This unification allows expressing symbolic AI, neural networks, quantum computing, geometric deep learning, and compositional reasoning in the same language. See [Hypercomplex Extensions](docs/Hypercomplex-Extensions.md) for details.
+
+## Hypercomplex Extensions
+
+Beyond Boolean and Real numbers, we can extend Tensor Logic to **hypercomplex number systems**, each corresponding to a different AI paradigm:
+
+| Number System | Dimensions | AI Paradigm | Example Applications |
+|---------------|-----------|-------------|---------------------|
+| **Boolean (𝔹)** | 1 | Symbolic Logic | Theorem proving, knowledge graphs |
+| **Real (ℝ)** | 1 | Neural Networks | Deep learning, gradient descent |
+| **Complex (ℂ)** | 2 | Quantum-Inspired AI | Quantum ML, Fourier learning, MRI/radar |
+| **Quaternion (ℍ)** | 4 | 3D Spatial Reasoning | Robotics, 3D vision, protein modeling |
+| **Octonion (𝕆)** | 8 | Non-Associative Logic | Compositional semantics, syntax trees |
+| **Sedenion (𝕊)** | 16 | Over-Parameterized Systems | Understanding deep learning |
+| **Higher** | 32+ | Hyper-Dimensional Computing | Sparse distributed memory, VSAs |
+
+**Key Insight**: Each step up the [Cayley-Dickson construction](https://en.wikipedia.org/wiki/Cayley%E2%80%93Dickson_construction) **loses algebraic structure** but **gains representational power**:
+
+- Lose ordering → Gain phase (quantum)
+- Lose commutativity → Gain rotation (3D geometry) 
+- Lose associativity → Gain context-sensitivity (syntax)
+- Lose division → Gain over-parameterization (deep learning)
+
+This framework unifies:
+- **Symbolic** (Boolean logic)
+- **Neural** (continuous optimization)
+- **Quantum** (amplitude + phase)
+- **Geometric** (rotation-equivariant)
+- **Compositional** (context-sensitive)
+
+### Running Hypercomplex Examples
+
+```bash
+npm run test:hypercomplex
+```
+
+See [Hypercomplex Extensions Documentation](docs/Hypercomplex-Extensions.md) and [Implementation Summary](docs/HYPERCOMPLEX_SUMMARY.md) for details.
 
 ## Demo Features
 
