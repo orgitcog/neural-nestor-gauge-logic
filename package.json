@@ -18,6 +18,9 @@
     "test:unit": "tsx scripts/test-unit.ts",
     "test:raptl": "tsx scripts/test-raptl.ts",
     "test": "tsx scripts/test-neural-nestor.ts && tsx scripts/test-validation.ts && tsx scripts/test-unit.ts && tsx scripts/test-raptl.ts"
+    "test:hypercomplex": "npx tsx scripts/test-hypercomplex.ts",
+    "test:graded-basis": "npx tsx scripts/test-graded-basis.ts",
+    "test": "tsx scripts/test-neural-nestor.ts && tsx scripts/test-validation.ts && tsx scripts/test-unit.ts"
   },
   "dependencies": {
     "mathjs": "^13.2.0"
