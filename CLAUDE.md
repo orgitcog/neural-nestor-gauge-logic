@@ -62,7 +62,7 @@ If `lake build` fails:
 ## TypeScript Tests
 
 ```bash
-# Run all tests (nestor + validation + unit)
+# Run all tests (nestor + validation + unit + raptl = 80 tests)
 npm test
 
 # Run neural nestor framework tests (10 tests)
@@ -73,6 +73,9 @@ npm run test:validation
 
 # Run exhaustive unit tests for all modules (35 tests)
 npm run test:unit
+
+# Run RAPTL (Resource-Aware Probabilistic Tensor Logic) tests (25 tests)
+npm run test:raptl
 
 # Run scroll/UI tests (requires Chrome/Puppeteer)
 npm run test:scroll
@@ -87,6 +90,18 @@ The validation test suite (`scripts/test-validation.ts`) validates implementatio
 - **Paper examples**: Boolean transitive closure from Domingos paper
 - **Classic benchmarks**: XOR with MLP (requires non-linearity)
 - **Batched operations**: Batch matrix multiplication
+
+### RAPTL Module
+
+The RAPTL module (`src/tensor-logic/raptl.ts`) implements concepts from Ben Goertzel's "Tensor Logic for Bridging Neural and Symbolic AI":
+
+| Feature | Description |
+|---------|-------------|
+| **Semiring Abstractions** | Boolean, Counting, Viterbi, Probabilistic, MinPlus semirings for flexible algebraic reasoning |
+| **PLN Truth Values** | Strength-confidence pairs with conjunction, disjunction, negation, deduction, revision operations |
+| **Resource Tracking** | HBM bytes, FLOPs, bandwidth, density estimation for tensors and einsum operations |
+| **Linear Logic Modalities** | Linear (single-use), Affine (at-most-once), Bang (unlimited reads), With (conditional) tensor management |
+| **RAPTL Triple Product** | Facts combining logic (tensor), uncertainty (PLN), and resources with full operation support |
 
 ## Common Commands
 
